@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model weights (large files)
+models/*.pt
+models/*.onnx
+!models/.gitkeep
+
+# Results (generated at runtime)
+results/*
+!results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/

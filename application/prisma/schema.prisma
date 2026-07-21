@@ -1,0 +1,215 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserRole {
+  FARMER @map("farmer")
+  UMKM   @map("umkm")
+  ADMIN  @map("admin")
+
+  @@map("user_role")
+}
+
+enum HarvestStatus {
+  DRAFT     @map("draft")
+  ANALYZING @map("analyzing")
+  AVAILABLE @map("available")
+  MATCHED   @map("matched")
+  SOLD      @map("sold")
+  CANCELLED @map("cancelled")
+
+  @@map("harvest_status")
+}
+
+enum OrderStatus {
+  DRAFT     @map("draft")
+  CONFIRMED @map("confirmed")
+  MATCHED   @map("matched")
+  RECEIVED  @map("received")
+  COMPLETED @map("completed")
+  CANCELLED @map("cancelled")
+
+  @@map("order_status")
+}
+
+enum QualityLabel {
+  FRESH  @map("fresh")
+  MIXED  @map("mixed")
+  ROTTEN @map("rotten")
+
+  @@map("quality_label")
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(120)
+  email        String?  @unique @db.VarChar(255)
+  passwordHash String?  @map("password_hash")
+  role         UserRole
+  farmer       Farmer?
+  umkm         Umkm?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("users")
+}
+
+model Farmer {
+  id              String         @id @default(uuid()) @db.Uuid
+  userId          String         @unique @map("user_id") @db.Uuid
+  farmName        String         @map("farm_name") @db.VarChar(160)
+  address         String
+  latitude        Float
+  longitude       Float
+  reputationScore Decimal        @default(80) @map("reputation_score") @db.Decimal(5, 2)
+  ratingCount     Int            @default(0) @map("rating_count")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  harvestBatches  HarvestBatch[]
+  ratings         Rating[]
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("farmers")
+}
+
+model Umkm {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  businessName String   @map("business_name") @db.VarChar(160)
+  address      String
+  latitude     Float
+  longitude    Float
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders       Order[]
+  ratings      Rating[]
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("umkms")
+}
+
+model HarvestBatch {
+  id                String          @id @default(uuid()) @db.Uuid
+  farmerId          String          @map("farmer_id") @db.Uuid
+  commodity         String          @db.VarChar(40)
+  quantityKg        Decimal         @map("quantity_kg") @db.Decimal(10, 2)
+  pricePerKg        Int             @map("price_per_kg")
+  availableDate     DateTime        @map("available_date") @db.Date
+  originalImageUrl  String          @map("original_image_url")
+  annotatedImageUrl String?         @map("annotated_image_url")
+  qualityScore      Decimal?        @map("quality_score") @db.Decimal(5, 2)
+  qualityLabel      QualityLabel?   @map("quality_label")
+  freshCount        Int?            @map("fresh_count")
+  rottenCount       Int?            @map("rotten_count")
+  totalDetected     Int?            @map("total_detected")
+  aiResultJson      Json?           @map("ai_result_json") @db.JsonB
+  aiSource          String?         @map("ai_source") @db.VarChar(40)
+  status            HarvestStatus   @default(DRAFT)
+  farmer            Farmer          @relation(fields: [farmerId], references: [id], onDelete: Restrict)
+  certificate       Certificate?
+  matchResults      MatchResult[]
+  selectedOrders    Order[]         @relation("SelectedBatch")
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([farmerId])
+  @@index([status, commodity, qualityScore])
+  @@index([availableDate])
+  @@map("harvest_batches")
+}
+
+model Certificate {
+  id              String       @id @default(uuid()) @db.Uuid
+  batchId         String       @unique @map("batch_id") @db.Uuid
+  certificateCode String       @unique @map("certificate_code") @db.VarChar(32)
+  snapshotJson    Json         @map("snapshot_json") @db.JsonB
+  hashSha256      String       @unique @map("hash_sha256") @db.Char(64)
+  verifyUrl       String       @map("verify_url")
+  qrImageUrl      String       @map("qr_image_url")
+  issuedAt        DateTime     @default(now()) @map("issued_at") @db.Timestamptz(6)
+  batch           HarvestBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
+
+model Order {
+  id              String        @id @default(uuid()) @db.Uuid
+  umkmId          String        @map("umkm_id") @db.Uuid
+  rawText         String        @map("raw_text")
+  commodity       String        @db.VarChar(40)
+  quantityKg      Decimal       @map("quantity_kg") @db.Decimal(10, 2)
+  minimumQuality  Decimal       @map("minimum_quality") @db.Decimal(5, 2)
+  neededDate      DateTime      @map("needed_date") @db.Date
+  latitude        Float
+  longitude       Float
+  selectedBatchId String?       @map("selected_batch_id") @db.Uuid
+  status          OrderStatus   @default(DRAFT)
+  nlpSource       String?       @map("nlp_source") @db.VarChar(40)
+  umkm            Umkm          @relation(fields: [umkmId], references: [id], onDelete: Restrict)
+  selectedBatch   HarvestBatch? @relation("SelectedBatch", fields: [selectedBatchId], references: [id], onDelete: SetNull)
+  matchResults    MatchResult[]
+  rating          Rating?
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([umkmId, status])
+  @@index([selectedBatchId])
+  @@map("orders")
+}
+
+model MatchResult {
+  id                     String       @id @default(uuid()) @db.Uuid
+  orderId                String       @map("order_id") @db.Uuid
+  batchId                String       @map("batch_id") @db.Uuid
+  qualityScore           Decimal      @map("quality_score") @db.Decimal(5, 2)
+  reputationScore        Decimal      @map("reputation_score") @db.Decimal(5, 2)
+  logisticsScore         Decimal      @map("logistics_score") @db.Decimal(5, 2)
+  qualityContribution    Decimal      @map("quality_contribution") @db.Decimal(6, 3)
+  reputationContribution Decimal      @map("reputation_contribution") @db.Decimal(6, 3)
+  logisticsContribution  Decimal      @map("logistics_contribution") @db.Decimal(6, 3)
+  totalScore             Decimal      @map("total_score") @db.Decimal(6, 3)
+  distanceKm             Decimal      @map("distance_km") @db.Decimal(10, 2)
+  durationMinutes        Int?         @map("duration_minutes")
+  estimatedCost          Int          @map("estimated_cost")
+  routeSource            String       @map("route_source") @db.VarChar(40)
+  rank                   Int
+  order                  Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  batch                  HarvestBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  createdAt              DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([orderId, batchId])
+  @@unique([orderId, rank])
+  @@index([orderId, rank])
+  @@index([batchId])
+  @@map("match_results")
+}
+
+model Rating {
+  id                 String   @id @default(uuid()) @db.Uuid
+  orderId            String   @unique @map("order_id") @db.Uuid
+  farmerId           String   @map("farmer_id") @db.Uuid
+  umkmId             String   @map("umkm_id") @db.Uuid
+  score              Int
+  comment            String?
+  oldReputationScore Decimal  @map("old_reputation_score") @db.Decimal(5, 2)
+  newReputationScore Decimal  @map("new_reputation_score") @db.Decimal(5, 2)
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  farmer             Farmer   @relation(fields: [farmerId], references: [id], onDelete: Restrict)
+  umkm               Umkm     @relation(fields: [umkmId], references: [id], onDelete: Restrict)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([farmerId])
+  @@index([umkmId])
+  @@map("ratings")
+}
