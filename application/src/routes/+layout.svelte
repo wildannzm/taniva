@@ -34,8 +34,8 @@
 						<span class="role-badge">
 							{$userRole === 'petani' ? '🧑‍🌾 Petani' : '🍽️ UMKM'}
 						</span>
-						<button class="btn-logout" onclick={handleLogout} aria-label="Ganti Peran">
-							Ganti Peran
+						<button class="btn-logout" onclick={handleLogout} aria-label="Logout">
+							Logout
 						</button>
 					{/if}
 				</div>
@@ -115,21 +115,23 @@
 	}
 
 	.btn-logout {
-		background: none;
-		border: none;
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--color-on-surface-variant);
+		background: #fee2e2;
+		border: 1px solid #fca5a5;
+		border-radius: 100px;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: #dc2626;
 		cursor: pointer;
-		padding: 0;
-		text-decoration: underline;
-		text-decoration-color: transparent;
-		transition: text-decoration-color var(--duration-fast);
+		padding: 0.4rem 1rem;
+		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	.btn-logout:hover {
-		text-decoration-color: currentColor;
-		color: var(--color-error);
+		background: #dc2626;
+		color: white;
+		border-color: #dc2626;
+		box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+		transform: translateY(-1px);
 	}
 
 	.app-main {
