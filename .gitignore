@@ -6,3 +6,5 @@ Thumbs.db
 /context/
 /PROMPT_*.md
 /*context*.zip
+skills-lock.json
+.agents

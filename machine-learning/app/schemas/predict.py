@@ -28,7 +28,7 @@ class PredictResponse(BaseModel):
 
     success: bool = True
     qualityScore: int = Field(ge=0, le=100)
-    qualityLabel: str = Field(pattern="^(fresh|mixed|rotten)$")
+    qualityLabel: str = Field(pattern="^(segar|campuran|busuk)$")
     freshCount: int = Field(ge=0)
     rottenCount: int = Field(ge=0)
     totalDetected: int = Field(ge=1)
