@@ -14,239 +14,346 @@
 	});
 </script>
 
-<div class="page-wrapper">
-	<!-- Background decorations -->
-	<div class="bg-blob blob-1"></div>
-	<div class="bg-blob blob-2"></div>
-	
-	<div class="dashboard-container animate-fade-in">
-	<header class="dashboard-header">
-		<div>
-			<h1 class="page-title">Dashboard Petani</h1>
-			<p class="page-subtitle">Kelola panen dan pantau kualitas tomat Anda.</p>
-		</div>
-		<div class="reputation-badge">
-			<span class="star">⭐</span>
-			<span class="score">4.8</span>
-			<span class="label">Reputasi Tinggi</span>
+<div class="dashboard-layout">
+	<!-- Hero Header -->
+	<header class="dashboard-hero">
+		<div class="mesh-bg"></div>
+		<div class="hero-content">
+			<div class="hero-text animate-slide-up">
+				<h1 class="page-title">Selamat datang, Petani!</h1>
+				<p class="page-subtitle">Kelola panen dan pantau kualitas tomat Anda hari ini.</p>
+			</div>
+			<div class="reputation-badge animate-slide-up" style="animation-delay: 100ms;">
+				<div class="star-icon">⭐</div>
+				<div class="rep-text">
+					<span class="score">4.8</span>
+					<span class="label">Reputasi Tinggi</span>
+				</div>
+			</div>
 		</div>
 	</header>
 
-	<div class="main-grid">
-		<!-- Quick Actions -->
-		<section class="section-card actions-section">
-			<h2 class="section-title">Aksi Cepat</h2>
-			<div class="action-grid">
-				<a href="/petani/upload" class="action-card primary-action">
-					<div class="action-icon">📸</div>
-					<div class="action-content">
-						<h3 class="action-title">Grading & Upload Panen</h3>
-						<p class="action-desc">Verifikasi kualitas tomat dengan AI</p>
+	<main class="dashboard-main">
+		<div class="content-wrapper">
+			<!-- Overlapping Stats Section -->
+			<section class="stats-overview animate-fade-in-up" style="animation-delay: 200ms;">
+				<div class="stat-card glass-card">
+					<div class="stat-icon primary-light">📦</div>
+					<div class="stat-info">
+						<div class="stat-label">Total Panen Terjual</div>
+						<div class="stat-value">345 <span class="unit">kg</span></div>
 					</div>
-					<div class="action-arrow">→</div>
-				</a>
-				
-				<a href="/petani/reputasi" class="action-card secondary-action">
-					<div class="action-icon">⭐</div>
-					<div class="action-content">
-						<h3 class="action-title">Detail Reputasi</h3>
-						<p class="action-desc">Lihat riwayat rating UMKM</p>
-					</div>
-					<div class="action-arrow">→</div>
-				</a>
-			</div>
-		</section>
-
-		<!-- Statistics -->
-		<section class="section-card stats-section">
-			<h2 class="section-title">Ringkasan Bulan Ini</h2>
-			<div class="stats-grid">
-				<div class="stat-box">
-					<div class="stat-value">345 <span class="unit">kg</span></div>
-					<div class="stat-label">Total Panen Terjual</div>
 				</div>
-				<div class="stat-box">
-					<div class="stat-value">88.5 <span class="unit">/ 100</span></div>
-					<div class="stat-label">Rata-rata Kualitas</div>
+				<div class="stat-card glass-card">
+					<div class="stat-icon primary-light">⭐</div>
+					<div class="stat-info">
+						<div class="stat-label">Rata-rata Kualitas</div>
+						<div class="stat-value">88.5 <span class="unit">/ 100</span></div>
+					</div>
+				</div>
+			</section>
+
+			<div class="main-grid">
+				<div class="left-col">
+					<!-- Quick Actions -->
+					<section class="section-card animate-slide-up" style="animation-delay: 300ms;">
+						<div class="section-header">
+							<h2 class="section-title">Aksi Cepat</h2>
+						</div>
+						<div class="action-grid">
+							<a href="/petani/upload" class="action-card primary">
+								<div class="action-icon-wrapper">📸</div>
+								<div class="action-text">
+									<h3>Grading Panen</h3>
+									<p>Verifikasi kualitas dengan AI</p>
+								</div>
+								<div class="arrow">→</div>
+							</a>
+							<a href="/petani/reputasi" class="action-card secondary">
+								<div class="action-icon-wrapper">📈</div>
+								<div class="action-text">
+									<h3>Detail Reputasi</h3>
+									<p>Lihat riwayat rating UMKM</p>
+								</div>
+								<div class="arrow">→</div>
+							</a>
+						</div>
+					</section>
+
+					<!-- Quality Score -->
+					<section class="section-card animate-slide-up" style="animation-delay: 400ms;">
+						<div class="section-header">
+							<h2 class="section-title">Skor Kualitas Bulan Ini</h2>
+						</div>
+						<QualityScoreCard score={88.5} />
+					</section>
+				</div>
+
+				<div class="right-col">
+					<!-- Recent Activity -->
+					<section class="section-card animate-slide-up" style="animation-delay: 500ms;">
+						<div class="section-header">
+							<h2 class="section-title">Riwayat Panen</h2>
+							<button class="btn-link">Lihat Semua</button>
+						</div>
+						<div class="history-list">
+							{#each recentHarvests as harvest}
+								<div class="history-item">
+									<div class="status-indicator {harvest.status}">
+										{#if harvest.status === 'verified'}
+											✓
+										{:else}
+											!
+										{/if}
+									</div>
+									<div class="history-info">
+										<h4>{harvest.id}</h4>
+										<p>{harvest.date}</p>
+									</div>
+									<div class="history-metrics">
+										<div class="metric">
+											<span class="m-label">Berat</span>
+											<span class="m-val">{harvest.weight}</span>
+										</div>
+										<div class="metric">
+											<span class="m-label">Mutu</span>
+											<span class="m-val score-{harvest.quality >= 90 ? 'a' : harvest.quality >= 80 ? 'b' : 'c'}">{harvest.quality}</span>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</section>
 				</div>
 			</div>
-			
-			<div class="score-card-wrapper mt-4">
-				<QualityScoreCard score={88.5} />
-			</div>
-		</section>
-
-		<!-- Recent Activity -->
-		<section class="section-card history-section">
-			<h2 class="section-title">Riwayat Panen Terakhir</h2>
-			<div class="history-list">
-				{#each recentHarvests as harvest}
-					<div class="history-item">
-						<div class="history-icon {harvest.status}">
-							{harvest.status === 'verified' ? '✓' : '!'}
-						</div>
-						<div class="history-details">
-							<div class="history-id">{harvest.id}</div>
-							<div class="history-date">{harvest.date}</div>
-						</div>
-						<div class="history-metrics">
-							<div class="metric">
-								<span class="metric-label">Kualitas:</span>
-								<span class="metric-val score-{harvest.quality >= 90 ? 'a' : harvest.quality >= 80 ? 'b' : 'c'}">{harvest.quality}</span>
-							</div>
-							<div class="metric">
-								<span class="metric-label">Berat:</span>
-								<span class="metric-val">{harvest.weight}</span>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-			<button class="btn-text-full">Lihat Semua Riwayat</button>
-		</section>
-	</div>
-</div>
+		</div>
+	</main>
 </div>
 
 <style>
-	.page-wrapper {
+	.dashboard-layout {
 		min-height: 100dvh;
-		background: #fdfbf7;
-		position: relative;
-		overflow: hidden;
-	}
-	
-	.bg-blob {
-		position: absolute;
-		border-radius: 50%;
-		filter: blur(80px);
-		z-index: 0;
-		opacity: 0.6;
-	}
-	
-	.blob-1 {
-		width: 400px;
-		height: 400px;
-		background: #c8e6c9;
-		top: -100px;
-		right: -50px;
-	}
-	
-	.blob-2 {
-		width: 350px;
-		height: 350px;
-		background: #ffecb3;
-		bottom: -50px;
-		left: -100px;
+		background: #faf9f5;
+		font-family: var(--font-sans, system-ui, sans-serif);
+		padding-bottom: 6rem; /* space for mobile nav */
 	}
 
-	.dashboard-container {
-		padding: 1.5rem 1.5rem 6rem; /* extra padding for bottom nav */
-		max-width: 64rem;
-		margin: 0 auto;
+	.dashboard-hero {
+		position: relative;
+		background: #0a2e11;
+		padding: 3rem 1.5rem 6rem;
+		overflow: hidden;
+		color: #ffffff;
+	}
+
+	.mesh-bg {
+		position: absolute;
+		inset: -50%;
+		background: 
+			radial-gradient(circle at 20% 30%, rgba(27, 94, 32, 0.8) 0%, transparent 50%),
+			radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.6) 0%, transparent 50%),
+			radial-gradient(circle at 50% 10%, rgba(139, 195, 74, 0.4) 0%, transparent 50%);
+		filter: blur(60px);
+		animation: pulseBg 15s ease-in-out infinite alternate;
+		z-index: 0;
+	}
+
+	@keyframes pulseBg {
+		0% { transform: scale(1) translate(0, 0); }
+		100% { transform: scale(1.1) translate(-2%, 2%); }
+	}
+
+	.hero-content {
 		position: relative;
 		z-index: 1;
-	}
-
-	.dashboard-header {
+		max-width: 64rem;
+		margin: 0 auto;
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
 		flex-wrap: wrap;
-		gap: 1rem;
-		margin-bottom: 2rem;
+		gap: 1.5rem;
+	}
+
+	.hero-text {
+		max-width: 400px;
 	}
 
 	.page-title {
-		margin: 0 0 0.25rem;
-		font-size: 1.75rem;
+		font-size: 2rem;
 		font-weight: 800;
-		color: var(--color-on-surface);
-		letter-spacing: -0.01em;
+		margin: 0 0 0.5rem;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
 	}
 
 	.page-subtitle {
-		margin: 0;
-		color: var(--color-on-surface-variant);
 		font-size: 0.9375rem;
+		color: rgba(255, 255, 255, 0.8);
+		margin: 0;
+		line-height: 1.5;
 	}
 
 	.reputation-badge {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		background: var(--color-surface-container-highest);
-		padding: 0.5rem 1rem;
-		border-radius: 2rem;
-		border: 1px solid var(--color-outline-variant);
+		gap: 0.75rem;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		padding: 0.75rem 1rem;
+		border-radius: 16px;
 	}
-	
-	.reputation-badge .star {
+
+	.star-icon {
+		font-size: 1.5rem;
+		filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+	}
+
+	.rep-text {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.rep-text .score {
+		font-size: 1.125rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.rep-text .label {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		color: #a5d6a7;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-top: 0.125rem;
+	}
+
+	.dashboard-main {
+		position: relative;
+		max-width: 64rem;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+	}
+
+	.content-wrapper {
+		margin-top: -3rem; /* Overlap effect */
+		position: relative;
+		z-index: 10;
+	}
+
+	.stats-overview {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		margin-bottom: 2rem;
+	}
+
+	@media (min-width: 640px) {
+		.stats-overview {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.stat-card {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		background: #ffffff;
+		padding: 1.25rem;
+		border-radius: 16px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+		border: 1px solid #f3f4f6;
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+
+	.stat-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 12px 40px rgba(27, 94, 32, 0.08);
+	}
+
+	.stat-icon {
+		width: 3rem;
+		height: 3rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 12px;
 		font-size: 1.25rem;
 	}
-	
-	.reputation-badge .score {
-		font-weight: 700;
-		color: var(--color-on-surface);
+
+	.stat-icon.primary-light {
+		background: #e8f5e9;
+		color: #1b5e20;
 	}
-	
-	.reputation-badge .label {
-		font-size: 0.75rem;
+
+	.stat-info {
+		flex: 1;
+	}
+
+	.stat-label {
+		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-primary);
-		background: var(--color-primary-container);
-		padding: 0.2rem 0.5rem;
-		border-radius: 1rem;
+		color: #6b7280;
+		margin-bottom: 0.25rem;
+	}
+
+	.stat-value {
+		font-size: 1.5rem;
+		font-weight: 800;
+		color: #111827;
+		line-height: 1;
+	}
+
+	.stat-value .unit {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: #9ca3af;
 	}
 
 	.main-grid {
 		display: grid;
-		gap: 1.5rem;
 		grid-template-columns: 1fr;
+		gap: 1.5rem;
 	}
 
-	@media (min-width: 768px) {
-		.main-grid {
-			grid-template-columns: 1fr 1fr;
-		}
-		.actions-section {
-			grid-column: 1 / -1;
-		}
-		.history-section {
-			grid-column: 1 / -1;
-		}
-	}
-	
 	@media (min-width: 1024px) {
 		.main-grid {
-			grid-template-columns: 2fr 1fr;
-		}
-		.actions-section {
-			grid-column: 1 / 2;
-		}
-		.stats-section {
-			grid-column: 2 / 3;
-			grid-row: 1 / 3;
-		}
-		.history-section {
-			grid-column: 1 / 2;
+			grid-template-columns: 3fr 2fr;
 		}
 	}
 
 	.section-card {
-		background: rgba(255, 255, 255, 0.85);
-		backdrop-filter: blur(12px);
-		border-radius: var(--radius-card);
-		border: 1px solid rgba(255, 255, 255, 0.5);
+		background: #ffffff;
+		border-radius: 20px;
 		padding: 1.5rem;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+		border: 1px solid #f3f4f6;
+		margin-bottom: 1.5rem;
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.25rem;
 	}
 
 	.section-title {
 		font-size: 1.125rem;
 		font-weight: 700;
-		margin: 0 0 1.25rem;
-		color: var(--color-on-surface);
+		color: #111827;
+		margin: 0;
+	}
+
+	.btn-link {
+		background: none;
+		border: none;
+		color: #1b5e20;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		cursor: pointer;
 	}
 
 	.action-grid {
@@ -258,127 +365,85 @@
 		display: flex;
 		align-items: center;
 		padding: 1.25rem;
-		border-radius: var(--radius-md);
+		border-radius: 16px;
 		text-decoration: none;
-		color: inherit;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		border: 1px solid transparent;
-	}
-	
-	.primary-action {
-		background: var(--color-primary);
-		color: white;
-	}
-	
-	.primary-action .action-desc {
-		color: rgba(255,255,255,0.8);
-	}
-	
-	.primary-action:hover {
-		background: #144b19;
-		transform: translateY(-4px) scale(1.02);
-		box-shadow: 0 12px 24px rgba(27, 94, 32, 0.25);
-	}
-	
-	.secondary-action {
-		background: var(--color-surface-container-low);
-		border-color: var(--color-outline-variant);
-	}
-	
-	.secondary-action:hover {
-		border-color: var(--color-primary);
-		background: var(--color-primary-container);
-		transform: translateY(-4px) scale(1.02);
-		box-shadow: 0 12px 24px rgba(27, 94, 32, 0.1);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		gap: 1rem;
 	}
 
-	.action-icon {
-		font-size: 2rem;
-		margin-right: 1rem;
-		background: rgba(255,255,255,0.2);
+	.action-card.primary {
+		background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+		color: #ffffff;
+		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.2);
+	}
+
+	.action-card.primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 12px 32px rgba(27, 94, 32, 0.3);
+	}
+
+	.action-card.secondary {
+		background: #ffffff;
+		border: 1px solid #e5e7eb;
+		color: #111827;
+	}
+
+	.action-card.secondary:hover {
+		border-color: #1b5e20;
+		background: #f8fcf8;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.08);
+	}
+
+	.action-icon-wrapper {
+		font-size: 1.75rem;
 		width: 3.5rem;
 		height: 3.5rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: var(--radius-md);
-	}
-	
-	.secondary-action .action-icon {
-		background: white;
-		box-shadow: var(--shadow-sm);
+		border-radius: 12px;
+		background: rgba(255,255,255,0.2);
 	}
 
-	.action-content {
+	.action-card.secondary .action-icon-wrapper {
+		background: #e8f5e9;
+	}
+
+	.action-text {
 		flex: 1;
 	}
 
-	.action-title {
+	.action-text h3 {
 		margin: 0 0 0.25rem;
 		font-size: 1rem;
-		font-weight: 600;
+		font-weight: 700;
 	}
 
-	.action-desc {
+	.action-card.secondary .action-text h3 {
+		color: #111827;
+	}
+
+	.action-text p {
 		margin: 0;
 		font-size: 0.8125rem;
-		line-height: 1.3;
+		opacity: 0.9;
 	}
-	
-	.action-arrow {
+
+	.action-card.secondary .action-text p {
+		color: #6b7280;
+	}
+
+	.arrow {
 		font-size: 1.25rem;
 		font-weight: bold;
 		opacity: 0.5;
-		transition: transform 0.2s;
+		transition: transform 0.3s;
 	}
-	
-	.action-card:hover .action-arrow {
+
+	.action-card:hover .arrow {
 		transform: translateX(4px);
 		opacity: 1;
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-	}
-	
-	.stat-box {
-		background: rgba(255, 255, 255, 0.6);
-		padding: 1rem;
-		border-radius: var(--radius-md);
-		text-align: center;
-		border: 1px solid rgba(255, 255, 255, 0.8);
-		transition: transform 0.2s, box-shadow 0.2s;
-	}
-	
-	.stat-box:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-	}
-	
-	.stat-value {
-		font-size: 1.5rem;
-		font-weight: 800;
-		color: var(--color-primary);
-		margin-bottom: 0.25rem;
-	}
-	
-	.stat-value .unit {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-on-surface-variant);
-	}
-	
-	.stat-label {
-		font-size: 0.75rem;
-		color: var(--color-on-surface-variant);
-		font-weight: 500;
-	}
-
-	.mt-4 {
-		margin-top: 1rem;
 	}
 
 	.history-list {
@@ -386,103 +451,107 @@
 		flex-direction: column;
 		gap: 0.75rem;
 	}
-	
+
 	.history-item {
 		display: flex;
 		align-items: center;
 		padding: 1rem;
-		border: 1px solid var(--color-outline-variant);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-container-lowest);
-		transition: border-color 0.2s;
+		border-radius: 12px;
+		background: #f9fafb;
+		border: 1px solid transparent;
+		transition: all 0.2s;
 	}
-	
+
 	.history-item:hover {
-		border-color: var(--color-primary);
+		background: #ffffff;
+		border-color: #e5e7eb;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 		transform: translateX(4px);
-		box-shadow: 0 4px 12px rgba(27, 94, 32, 0.08);
 	}
-	
-	.history-icon {
-		width: 2.5rem;
-		height: 2.5rem;
+
+	.status-indicator {
+		width: 2.25rem;
+		height: 2.25rem;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-weight: bold;
-		font-size: 1.25rem;
+		font-size: 1rem;
 		margin-right: 1rem;
 		flex-shrink: 0;
 	}
-	
-	.history-icon.verified {
-		background: var(--color-primary-container);
-		color: var(--color-primary);
+
+	.status-indicator.verified {
+		background: #e8f5e9;
+		color: #1b5e20;
 	}
-	
-	.history-icon.alert {
+
+	.status-indicator.alert {
 		background: #ffebee;
-		color: var(--color-error);
+		color: #d32f2f;
 	}
-	
-	.history-details {
+
+	.history-info {
 		flex: 1;
 	}
-	
-	.history-id {
-		font-weight: 600;
+
+	.history-info h4 {
+		margin: 0 0 0.125rem;
 		font-size: 0.9375rem;
-		color: var(--color-on-surface);
-		margin-bottom: 0.125rem;
+		font-weight: 600;
+		color: #111827;
 	}
-	
-	.history-date {
+
+	.history-info p {
+		margin: 0;
 		font-size: 0.75rem;
-		color: var(--color-on-surface-variant);
+		color: #6b7280;
 	}
-	
+
 	.history-metrics {
 		display: flex;
 		gap: 1rem;
 		text-align: right;
 	}
-	
+
 	.metric {
 		display: flex;
 		flex-direction: column;
 	}
-	
-	.metric-label {
+
+	.m-label {
 		font-size: 0.6875rem;
-		color: var(--color-on-surface-variant);
+		color: #6b7280;
 		margin-bottom: 0.125rem;
 	}
-	
-	.metric-val {
+
+	.m-val {
+		font-size: 0.875rem;
 		font-weight: 700;
-		font-size: 0.9375rem;
+		color: #111827;
 	}
-	
-	.score-a { color: var(--color-primary); }
-	.score-b { color: var(--color-warning); }
-	.score-c { color: var(--color-error); }
-	
-	.btn-text-full {
-		width: 100%;
-		padding: 0.875rem;
-		margin-top: 1rem;
-		background: var(--color-surface-container-low);
-		border: none;
-		border-radius: var(--radius-md);
-		font-weight: 600;
-		color: var(--color-on-surface-variant);
-		cursor: pointer;
-		transition: all 0.2s;
+
+	.score-a { color: #1b5e20; }
+	.score-b { color: #f9a825; }
+	.score-c { color: #d32f2f; }
+
+	/* Animations */
+	.animate-slide-up {
+		animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		opacity: 0;
 	}
-	
-	.btn-text-full:hover {
-		background: var(--color-outline-variant);
-		color: var(--color-on-surface);
+	.animate-fade-in-up {
+		animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		opacity: 0;
+	}
+
+	@keyframes slideUp {
+		from { opacity: 0; transform: translateY(20px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+	@keyframes fadeInUp {
+		from { opacity: 0; transform: translateY(30px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 </style>
