@@ -1,12 +1,144 @@
 <script>
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-
+	import { userRole } from '$lib/stores/app.js';
+	import { page } from '$app/stores';
+	
 	let { children } = $props();
+	
+	// Show nav only if not on the root landing page
+	let showNav = $derived($page.url.pathname !== '/');
+	
+	function handleLogout() {
+		userRole.set(null);
+		window.location.href = '/';
+	}
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>Taniva — Agri-Tech Trust Layer</title>
 </svelte:head>
 
-{@render children()}
+<div class="app-layout">
+	{#if showNav}
+		<header class="app-topbar">
+			<div class="topbar-container">
+				<a href={$userRole ? `/${$userRole}` : '/'} class="brand">
+					<span class="brand-logo">🌿</span>
+					<span class="brand-text">Taniva</span>
+				</a>
+				
+				<div class="topbar-actions">
+					{#if $userRole}
+						<span class="role-badge">
+							{$userRole === 'petani' ? '🧑‍🌾 Petani' : '🍽️ UMKM'}
+						</span>
+						<button class="btn-logout" onclick={handleLogout} aria-label="Ganti Peran">
+							Ganti Peran
+						</button>
+					{/if}
+				</div>
+			</div>
+		</header>
+	{/if}
+
+	<main class="app-main" class:with-nav={showNav}>
+		{@render children()}
+	</main>
+</div>
+
+<style>
+	.app-layout {
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
+		background: var(--color-background);
+	}
+
+	.app-topbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 3.5rem;
+		background: rgba(255, 255, 255, 0.85);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border-bottom: 1px solid var(--color-outline-variant);
+		z-index: 50;
+	}
+
+	.topbar-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		height: 100%;
+		padding: 0 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+	}
+
+	.brand-logo {
+		font-size: 1.25rem;
+	}
+
+	.brand-text {
+		font-weight: 700;
+		font-size: 1.125rem;
+		color: var(--color-primary);
+	}
+
+	.topbar-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.role-badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		background: var(--color-surface-container-high);
+		padding: 0.25rem 0.625rem;
+		border-radius: var(--radius-full);
+		color: var(--color-on-surface);
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.btn-logout {
+		background: none;
+		border: none;
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--color-on-surface-variant);
+		cursor: pointer;
+		padding: 0;
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		transition: text-decoration-color var(--duration-fast);
+	}
+
+	.btn-logout:hover {
+		text-decoration-color: currentColor;
+		color: var(--color-error);
+	}
+
+	.app-main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.app-main.with-nav {
+		padding-top: 3.5rem; /* height of topbar */
+	}
+</style>

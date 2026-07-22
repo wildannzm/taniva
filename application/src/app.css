@@ -1,1 +1,547 @@
 @import 'tailwindcss';
+
+/* ============================================================
+   Taniva Design System v2.0
+   Agri-Tech Trust Layer — Color Palette, Typography, & Tokens
+   ============================================================ */
+
+@theme {
+	/* ── Primary (Growth & Trust) ─────────────────────────────── */
+	--color-primary: #1b5e20;
+	--color-on-primary: #ffffff;
+	--color-primary-container: #e8f5e9;
+	--color-on-primary-container: #002106;
+
+	/* ── Secondary (Status & Alerts) ──────────────────────────── */
+	--color-error: #d32f2f;
+	--color-on-error: #ffffff;
+	--color-warning: #f9a825;
+
+	/* ── Neutral (Surfaces & Backgrounds) ─────────────────────── */
+	--color-surface: #faf9f5;
+	--color-surface-dim: #dadad6;
+	--color-surface-bright: #faf9f5;
+	--color-surface-container-lowest: #ffffff;
+	--color-surface-container-low: #f4f4f0;
+	--color-surface-container-high: #e8e8e4;
+	--color-on-surface: #1c1c1a;
+	--color-on-surface-variant: #44474e;
+	--color-outline-variant: #dadad6;
+
+	/* ── Typography ───────────────────────────────────────────── */
+	--font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+	/* Font Sizes (name: size / line-height) */
+	--text-display-lg: 3.5625rem;    /* 57px */
+	--text-display-lg--line-height: 4rem;          /* 64px */
+
+	--text-headline-lg: 2rem;        /* 32px */
+	--text-headline-lg--line-height: 2.5rem;       /* 40px */
+
+	--text-headline-md: 1.5rem;      /* 24px */
+	--text-headline-md--line-height: 2rem;         /* 32px */
+
+	--text-title-lg: 1.25rem;        /* 20px */
+	--text-title-lg--line-height: 1.75rem;         /* 28px */
+
+	--text-body-lg: 1rem;            /* 16px */
+	--text-body-lg--line-height: 1.5rem;           /* 24px */
+
+	--text-label-md: 0.75rem;        /* 12px */
+	--text-label-md--line-height: 1rem;            /* 16px */
+
+	/* ── Spacing & Layout ─────────────────────────────────────── */
+	--spacing-gutter-mobile: 1rem;       /* 16px */
+	--spacing-gutter-desktop: 1.5rem;    /* 24px */
+	--spacing-section: 1.5rem;           /* 24px */
+
+	/* ── Border Radius ────────────────────────────────────────── */
+	--radius-card: 0.5rem;               /* 8px — ROUND_EIGHT */
+	--radius-sm: 0.375rem;               /* 6px */
+	--radius-lg: 0.75rem;                /* 12px */
+	--radius-full: 9999px;
+
+	/* ── Shadows ──────────────────────────────────────────────── */
+	--shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+	--shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+	--shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+
+	/* ── Transitions ──────────────────────────────────────────── */
+	--ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+	--duration-fast: 150ms;
+	--duration-normal: 250ms;
+	--duration-slow: 350ms;
+
+	/* ── Touch Target ─────────────────────────────────────────── */
+	--touch-target-min: 3rem;            /* 48px */
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	scroll-behavior: smooth;
+}
+
+body {
+	font-family: var(--font-sans);
+	font-size: var(--text-body-lg);
+	line-height: var(--text-body-lg--line-height);
+	color: var(--color-on-surface);
+	background-color: var(--color-surface);
+	margin: 0;
+}
+
+/* ============================================================
+   Typography Utilities
+   ============================================================ */
+
+.text-display-lg {
+	font-size: var(--text-display-lg);
+	line-height: var(--text-display-lg--line-height);
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.text-headline-lg {
+	font-size: var(--text-headline-lg);
+	line-height: var(--text-headline-lg--line-height);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.text-headline-md {
+	font-size: var(--text-headline-md);
+	line-height: var(--text-headline-md--line-height);
+	font-weight: 600;
+}
+
+.text-title-lg {
+	font-size: var(--text-title-lg);
+	line-height: var(--text-title-lg--line-height);
+	font-weight: 600;
+}
+
+.text-body-lg {
+	font-size: var(--text-body-lg);
+	line-height: var(--text-body-lg--line-height);
+	font-weight: 400;
+}
+
+.text-label-md {
+	font-size: var(--text-label-md);
+	line-height: var(--text-label-md--line-height);
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+
+/* ============================================================
+   Component: Card — "Trust Container"
+   ============================================================ */
+
+.card {
+	background-color: var(--color-surface-container-lowest);
+	border: 1px solid var(--color-outline-variant);
+	border-radius: var(--radius-card);
+	padding: var(--spacing-gutter-mobile);
+	box-shadow: var(--shadow-card);
+	transition: box-shadow var(--duration-normal) var(--ease-smooth),
+	            transform var(--duration-normal) var(--ease-smooth);
+}
+
+.card-interactive {
+	cursor: pointer;
+}
+
+.card-interactive:hover {
+	box-shadow: var(--shadow-card-hover);
+	transform: translateY(-1px);
+}
+
+.card-interactive:active {
+	transform: translateY(0);
+}
+
+/* ============================================================
+   Component: Status Indicators
+   ============================================================ */
+
+/* Verified Badge */
+.badge-verified {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background-color: var(--color-primary-container);
+	color: var(--color-primary);
+	font-size: var(--text-label-md);
+	line-height: var(--text-label-md--line-height);
+	font-weight: 500;
+	padding: 0.25rem 0.625rem;
+	border-radius: var(--radius-full);
+}
+
+/* System Status Dot */
+.status-dot {
+	display: inline-block;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: var(--radius-full);
+	flex-shrink: 0;
+}
+
+.status-dot-active {
+	background-color: var(--color-primary);
+}
+
+.status-dot-error {
+	background-color: var(--color-error);
+}
+
+.status-dot-warning {
+	background-color: var(--color-warning);
+}
+
+/* Quality Grade Labels */
+.grade {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--text-label-md);
+	line-height: var(--text-label-md--line-height);
+	font-weight: 600;
+	padding: 0.25rem 0.75rem;
+	border-radius: var(--radius-sm);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.grade-a {
+	background-color: var(--color-primary-container);
+	color: var(--color-primary);
+}
+
+.grade-b {
+	background-color: #fff8e1;
+	color: #f57f17;
+}
+
+.grade-c {
+	background-color: #ffebee;
+	color: var(--color-error);
+}
+
+/* ============================================================
+   Component: Buttons
+   ============================================================ */
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	font-family: var(--font-sans);
+	font-size: var(--text-body-lg);
+	font-weight: 600;
+	padding: 0.625rem 1.5rem;
+	border-radius: var(--radius-card);
+	border: none;
+	cursor: pointer;
+	min-height: var(--touch-target-min);
+	transition: background-color var(--duration-fast) var(--ease-smooth),
+	            box-shadow var(--duration-fast) var(--ease-smooth),
+	            transform var(--duration-fast) var(--ease-smooth);
+	text-decoration: none;
+}
+
+.btn:active {
+	transform: scale(0.98);
+}
+
+.btn-primary {
+	background-color: var(--color-primary);
+	color: var(--color-on-primary);
+}
+
+.btn-primary:hover {
+	background-color: #15491a;
+	box-shadow: var(--shadow-card-hover);
+}
+
+.btn-outline {
+	background-color: transparent;
+	color: var(--color-primary);
+	border: 1.5px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+	background-color: var(--color-primary-container);
+}
+
+.btn-ghost {
+	background-color: transparent;
+	color: var(--color-on-surface-variant);
+}
+
+.btn-ghost:hover {
+	background-color: var(--color-surface-container-high);
+}
+
+/* ============================================================
+   Component: Navigation — Bottom Nav (Mobile)
+   ============================================================ */
+
+.bottom-nav {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	background-color: var(--color-surface-container-lowest);
+	border-top: 1px solid var(--color-outline-variant);
+	padding-block: 0.5rem;
+	z-index: 50;
+	min-height: var(--touch-target-min);
+}
+
+.bottom-nav-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.125rem;
+	color: var(--color-on-surface-variant);
+	font-size: var(--text-label-md);
+	line-height: var(--text-label-md--line-height);
+	font-weight: 500;
+	text-decoration: none;
+	padding: 0.25rem 1rem;
+	border-radius: var(--radius-lg);
+	transition: color var(--duration-fast) var(--ease-smooth),
+	            background-color var(--duration-fast) var(--ease-smooth);
+	min-width: var(--touch-target-min);
+	min-height: var(--touch-target-min);
+	justify-content: center;
+}
+
+.bottom-nav-item:hover {
+	background-color: var(--color-surface-container-high);
+}
+
+.bottom-nav-item.active {
+	color: var(--color-primary);
+}
+
+/* ============================================================
+   Component: Sidebar Navigation (Desktop)
+   ============================================================ */
+
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 16rem;
+	background-color: var(--color-surface-container-lowest);
+	border-right: 1px solid var(--color-outline-variant);
+	padding: var(--spacing-gutter-desktop);
+	display: flex;
+	flex-direction: column;
+	z-index: 40;
+}
+
+.sidebar-link {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	border-radius: var(--radius-card);
+	color: var(--color-on-surface-variant);
+	font-weight: 500;
+	text-decoration: none;
+	transition: background-color var(--duration-fast) var(--ease-smooth),
+	            color var(--duration-fast) var(--ease-smooth);
+	min-height: var(--touch-target-min);
+}
+
+.sidebar-link:hover {
+	background-color: var(--color-surface-container-high);
+	color: var(--color-on-surface);
+}
+
+.sidebar-link.active {
+	background-color: var(--color-primary-container);
+	color: var(--color-primary);
+	font-weight: 600;
+}
+
+/* ============================================================
+   Component: Top Bar
+   ============================================================ */
+
+.topbar {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.75rem var(--spacing-gutter-mobile);
+	background-color: var(--color-surface-container-lowest);
+	border-bottom: 1px solid var(--color-outline-variant);
+	min-height: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+	.topbar {
+		padding-inline: var(--spacing-gutter-desktop);
+	}
+}
+
+.topbar-search {
+	flex: 1;
+	max-width: 28rem;
+	background-color: var(--color-surface-container-low);
+	border: 1px solid var(--color-outline-variant);
+	border-radius: var(--radius-card);
+	padding: 0.5rem 1rem;
+	font-family: var(--font-sans);
+	font-size: var(--text-body-lg);
+	color: var(--color-on-surface);
+	outline: none;
+	transition: border-color var(--duration-fast) var(--ease-smooth),
+	            box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+.topbar-search::placeholder {
+	color: var(--color-on-surface-variant);
+}
+
+.topbar-search:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-container);
+}
+
+/* ============================================================
+   Layout Utilities
+   ============================================================ */
+
+.container {
+	width: 100%;
+	max-width: 80rem;
+	margin-inline: auto;
+	padding-inline: var(--spacing-gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+	.container {
+		padding-inline: var(--spacing-gutter-desktop);
+	}
+}
+
+/* Page content area when sidebar is present (desktop) */
+@media (min-width: 1024px) {
+	.main-content {
+		margin-left: 16rem;
+	}
+}
+
+/* Mobile: bottom-nav offset */
+@media (max-width: 1023px) {
+	.main-content {
+		padding-bottom: 4.5rem;
+	}
+}
+
+/* ============================================================
+   Utility: Matching Score Bars
+   ============================================================ */
+
+.score-bar-track {
+	width: 100%;
+	height: 0.5rem;
+	background-color: var(--color-surface-container-high);
+	border-radius: var(--radius-full);
+	overflow: hidden;
+}
+
+.score-bar-fill {
+	height: 100%;
+	border-radius: var(--radius-full);
+	transition: width var(--duration-slow) var(--ease-smooth);
+}
+
+.score-bar-fill-quality {
+	background-color: var(--color-primary);
+}
+
+.score-bar-fill-reputation {
+	background-color: #2196f3;
+}
+
+.score-bar-fill-logistics {
+	background-color: var(--color-warning);
+}
+
+/* ============================================================
+   Utility: Circular Gauge (Quality Score)
+   ============================================================ */
+
+.gauge {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.gauge-label {
+	position: absolute;
+	font-weight: 700;
+	color: var(--color-on-surface);
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes fade-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+	from { opacity: 0; transform: translateY(1rem); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+	from { opacity: 0; transform: scale(0.95); }
+	to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+	animation: fade-in var(--duration-normal) var(--ease-smooth) both;
+}
+
+.animate-slide-up {
+	animation: slide-up var(--duration-slow) var(--ease-smooth) both;
+}
+
+.animate-scale-in {
+	animation: scale-in var(--duration-normal) var(--ease-smooth) both;
+}
+
+/* Staggered animation delays */
+.delay-1 { animation-delay: 50ms; }
+.delay-2 { animation-delay: 100ms; }
+.delay-3 { animation-delay: 150ms; }
+.delay-4 { animation-delay: 200ms; }
+.delay-5 { animation-delay: 250ms; }

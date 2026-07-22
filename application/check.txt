@@ -1,0 +1,27 @@
+Loading svelte-check in workspace: /home/zackyha/project/taniva/taniva-v1/application
+Getting Svelte diagnostics...
+
+/home/zackyha/project/taniva/taniva-v1/application/src/lib/components/RatingForm.svelte:28:3
+Warn: `<div>` with a mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions (svelte)
+	<form onsubmit={handleSubmit}>
+		<div class="stars-container" onmouseleave={() => hoverRating = 0}>
+			{#each [1, 2, 3, 4, 5] as star}
+				<button
+					type="button"
+					class="star-btn"
+					class:active={star <= (hoverRating || rating)}
+					onmouseenter={() => hoverRating = star}
+					onclick={() => setRating(star)}
+					{disabled}
+					aria-label="Beri rating {star} bintang"
+				>
+					<svg viewBox="0 0 24 24" fill={star <= (hoverRating || rating) ? '#f9a825' : 'none'} stroke={star <= (hoverRating || rating) ? '#f9a825' : 'var(--color-outline-variant)'} stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+					</svg>
+				</button>
+			{/each}
+		</div>
+
+====================================
+svelte-check found 0 errors and 1 warning in 1 file
