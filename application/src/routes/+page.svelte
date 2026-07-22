@@ -1,626 +1,754 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { userRole } from '$lib/stores/app.js';
-	
-	let authMode = $state('login'); // 'login' | 'register'
-	let username = $state('');
-	let password = $state('');
-	
-	/** @type {'petani'|'umkm'} */
-	let selectedRole = $state('petani'); 
-	let isAuthenticating = $state(false);
-	let errorMsg = $state('');
-
-	/** @param {'login' | 'register'} mode */
-	function toggleMode(mode) {
-		authMode = mode;
-		errorMsg = '';
-		username = '';
-		password = '';
-	}
-
-	function handleAuth() {
-		errorMsg = '';
-		if (username.trim().length < 3 || password.length < 3) {
-			errorMsg = 'Username dan password minimal 3 karakter.';
-			return;
-		}
-
-		isAuthenticating = true;
-		
-		setTimeout(() => {
-			isAuthenticating = false;
-			
-			/** @type {any[]} */
-			const users = JSON.parse(localStorage.getItem('taniva_users') || '[]');
-
-			if (authMode === 'register') {
-				if (users.find(u => u.username === username)) {
-					errorMsg = 'Username sudah terdaftar.';
-					return;
-				}
-				users.push({ username, password, role: selectedRole });
-				localStorage.setItem('taniva_users', JSON.stringify(users));
-				userRole.set(selectedRole);
-				goto(`/${selectedRole}`);
-			} else {
-				const user = users.find(u => u.username === username && u.password === password);
-				if (user) {
-					userRole.set(user.role);
-					goto(`/${user.role}`);
-				} else {
-					errorMsg = 'Username atau kata sandi salah.';
-				}
-			}
-		}, 1200);
-	}
 </script>
 
-<div class="split-layout">
-	<!-- Left Side: Visual/Brand -->
-	<div class="brand-panel">
-		<div class="mesh-bg"></div>
-		<div class="brand-content animate-slide-up-slow">
-			<div class="logo-badge">🌿 Taniva</div>
-			<h1 class="brand-title">Agri-Tech<br/>Trust Layer<br/>Solo Raya</h1>
-			<p class="brand-subtitle">Ekosistem terpadu untuk memastikan kualitas panen dan membangun kepercayaan antara Petani dan UMKM.</p>
+<div class="landing-page">
+	<!-- Navbar -->
+	<nav class="navbar">
+		<div class="nav-content">
+			<div class="logo">🌿 Taniva</div>
+			<div class="nav-links">
+				<button class="btn-login" onclick={() => goto('/login')}>Masuk / Daftar</button>
+			</div>
 		</div>
-	</div>
+	</nav>
 
-	<!-- Right Side: Auth Form -->
-	<div class="auth-panel">
-		<div class="auth-container animate-fade-in-up">
+	<!-- Hero Section -->
+	<header class="hero-section">
+		<div class="mesh-bg"></div>
+		
+		<div class="hero-container">
+			<div class="hero-content">
+				<div class="hero-badge animate-fade-in-up">
+					<span class="pulse-dot"></span> Inovasi Pertanian Digital
+				</div>
+				<h1 class="hero-title animate-fade-in-up" style="animation-delay: 100ms;">
+					Agri-Tech Trust Layer <br/>
+					<span class="text-gradient">Solo Raya</span>
+				</h1>
+				<p class="hero-desc animate-fade-in-up" style="animation-delay: 200ms;">
+					Ekosistem terpadu berbasis <strong>AI & Blockchain</strong> untuk memastikan kualitas panen dan membangun kepercayaan mutlak antara Petani dan UMKM kuliner.
+				</p>
+				
+				<div class="hero-actions animate-fade-in-up" style="animation-delay: 300ms;">
+					<button class="btn-primary" onclick={() => goto('/login')}>
+						Mulai Sekarang
+						<span class="arrow">→</span>
+					</button>
+					<a href="#features" class="btn-secondary">Pelajari Lebih Lanjut</a>
+				</div>
+			</div>
 			
-			<div class="tabs-container">
-				<div class="tabs-bg">
-					<button class="tab-btn {authMode === 'login' ? 'active' : ''}" onclick={() => toggleMode('login')}>Masuk</button>
-					<button class="tab-btn {authMode === 'register' ? 'active' : ''}" onclick={() => toggleMode('register')}>Daftar</button>
-					<div class="tab-indicator {authMode}"></div>
-				</div>
-			</div>
-
-			<div class="auth-header">
-				<h2>{authMode === 'login' ? 'Selamat Datang Kembali' : 'Mulai Perjalanan Anda'}</h2>
-				<p>{authMode === 'login' ? 'Masuk ke ekosistem Taniva.' : 'Buat akun Taniva dalam hitungan detik.'}</p>
-			</div>
-
-			<form class="auth-form" onsubmit={(e) => { e.preventDefault(); handleAuth(); }}>
-				{#if errorMsg}
-					<div class="error-toast animate-shake">
-						<span class="error-icon">⚠</span>
-						<span>{errorMsg}</span>
+			<div class="hero-visual animate-fade-in-up" style="animation-delay: 400ms;">
+				<div class="mockup-window">
+					<div class="glow-effect"></div>
+					<div class="mockup-header">
+						<div class="dot" style="background:#ff5f56"></div>
+						<div class="dot" style="background:#ffbd2e"></div>
+						<div class="dot" style="background:#27c93f"></div>
 					</div>
-				{/if}
-
-				<div class="input-container">
-					<input type="text" id="username" bind:value={username} required placeholder=" " />
-					<label for="username">Username / No. HP</label>
-					<div class="input-line"></div>
-				</div>
-
-				<div class="input-container">
-					<input type="password" id="password" bind:value={password} required placeholder=" " />
-					<label for="password">Kata Sandi</label>
-					<div class="input-line"></div>
-				</div>
-
-				{#if authMode === 'register'}
-					<div class="role-selector animate-expand">
-						<p class="role-label">Pilih Peran Anda</p>
-						<div class="role-grid">
-							<label class="role-card {selectedRole === 'petani' ? 'selected' : ''}">
-								<input type="radio" name="role" value="petani" bind:group={selectedRole} />
-								<div class="role-icon">🧑‍🌾</div>
-								<div class="role-text">
-									<span class="role-title">Petani</span>
-									<span class="role-desc">Penyedia Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-							
-							<label class="role-card {selectedRole === 'umkm' ? 'selected' : ''}">
-								<input type="radio" name="role" value="umkm" bind:group={selectedRole} />
-								<div class="role-icon">🏪</div>
-								<div class="role-text">
-									<span class="role-title">UMKM</span>
-									<span class="role-desc">Pembeli Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
+					<div class="mockup-body">
+						<div class="m-title">Sistem Verifikasi Otomatis</div>
+						<div class="mockup-card top-card animate-float-1">
+							<div class="mc-icon">🤖</div>
+							<div class="mc-info">
+								<span class="mc-label">Grading AI Selesai</span>
+								<span class="mc-val text-green">Skor 98/100 (Grade A)</span>
+							</div>
+						</div>
+						<div class="mockup-card middle-card animate-float-2">
+							<div class="mc-icon">⛓️</div>
+							<div class="mc-info">
+								<span class="mc-label">Sertifikat Blockchain</span>
+								<span class="mc-val font-mono">0x7F2...9C4A</span>
+							</div>
+						</div>
+						<div class="mockup-card bottom-card animate-float-3">
+							<div class="mc-icon">⭐</div>
+							<div class="mc-info">
+								<span class="mc-label">Reputasi Otomatis</span>
+								<span class="mc-val">Skor Petani Naik +5</span>
+							</div>
 						</div>
 					</div>
-				{/if}
-
-				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || username.trim().length < 3 || password.length < 3}>
-					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
-					{#if isAuthenticating}
-						<div class="spinner"></div>
-					{/if}
-				</button>
-			</form>
+				</div>
+			</div>
 		</div>
-	</div>
+	</header>
+
+	<!-- Features Section -->
+	<section id="features" class="features-section">
+		<div class="section-container">
+			<div class="section-header">
+				<h2 class="section-title">Kenapa Memilih Taniva?</h2>
+				<p class="section-subtitle">Kami membawa transparansi penuh ke dalam rantai pasok pertanian lokal Anda.</p>
+			</div>
+			
+			<div class="features-grid">
+				<div class="feature-card">
+					<div class="feature-icon">🤖</div>
+					<h3 class="feature-title">Computer Vision AI</h3>
+					<p class="feature-desc">Tidak perlu lagi menebak kualitas. AI kami memindai dan memberikan skor objektivitas kualitas hasil panen secara otomatis.</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">⛓️</div>
+					<h3 class="feature-title">Jejak Blockchain</h3>
+					<p class="feature-desc">Setiap panen dicatat dalam blockchain. UMKM dapat memindai QR code untuk memverifikasi orisinalitas langsung dari kebun.</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">🤝</div>
+					<h3 class="feature-title">Reputasi Terpercaya</h3>
+					<p class="feature-desc">Bangun rekam jejak yang solid. Petani berkualitas akan selalu direkomendasikan kepada UMKM yang mencari bahan baku terbaik.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- How It Works Section -->
+	<section class="how-it-works">
+		<div class="section-container">
+			<div class="section-header">
+				<h2 class="section-title">Cara Kerja Ekosistem</h2>
+			</div>
+			
+			<div class="steps-container">
+				<div class="step">
+					<div class="step-number">1</div>
+					<div class="step-content">
+						<h4>Petani Unggah Foto Panen</h4>
+						<p>AI Taniva langsung memproses foto untuk menghasilkan skor kualitas.</p>
+					</div>
+				</div>
+				<div class="step-connector"></div>
+				<div class="step">
+					<div class="step-number">2</div>
+					<div class="step-content">
+						<h4>Sertifikat Blockchain Dibuat</h4>
+						<p>Sistem merilis QR Code sebagai bukti otentik tanpa bisa dipalsukan.</p>
+					</div>
+				</div>
+				<div class="step-connector"></div>
+				<div class="step">
+					<div class="step-number">3</div>
+					<div class="step-content">
+						<h4>UMKM Terima & Verifikasi</h4>
+						<p>Pindai QR Code untuk cek kualitas, lalu berikan rating pada Petani.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- CTA Section -->
+	<section class="cta-section">
+		<div class="cta-box">
+			<h2>Tingkatkan Standar Bisnis Anda Hari Ini</h2>
+			<p>Bergabunglah dengan ribuan Petani dan UMKM di Solo Raya yang telah menggunakan Taniva.</p>
+			<button class="btn-primary btn-large" onclick={() => goto('/login')}>Daftar Gratis Sekarang</button>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="footer-content">
+			<div class="footer-brand">🌿 Taniva</div>
+			<div class="footer-copy">© 2026 Taniva Agri-Tech. Hak cipta dilindungi.</div>
+		</div>
+	</footer>
 </div>
 
 <style>
 	:global(body) {
 		margin: 0;
 		font-family: var(--font-sans, system-ui, sans-serif);
+		background: #faf9f5;
+		scroll-behavior: smooth;
 	}
 
-	.split-layout {
+	.landing-page {
+		width: 100%;
+		overflow-x: hidden;
+	}
+
+	/* Navbar */
+	.navbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		padding: 1rem 0;
+		z-index: 100;
+		background: rgba(250, 249, 245, 0.85);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid rgba(27, 94, 32, 0.05);
+		transition: all 0.3s ease;
+	}
+
+	.nav-content {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 0 2rem;
 		display: flex;
-		min-height: 100dvh;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.logo {
+		font-size: 1.5rem;
+		font-weight: 800;
+		color: #1b5e20;
+		letter-spacing: -0.02em;
+	}
+
+	.btn-login {
 		background: #ffffff;
-		overflow: hidden;
+		border: 2px solid #1b5e20;
+		color: #1b5e20;
+		padding: 0.5rem 1.5rem;
+		border-radius: 100px;
+		font-weight: 700;
+		font-size: 0.9375rem;
+		cursor: pointer;
+		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	/* Left Panel */
-	.brand-panel {
-		display: none;
-		flex: 1.2;
+	.btn-login:hover {
+		background: #1b5e20;
+		color: #ffffff;
+		box-shadow: 0 4px 12px rgba(27, 94, 32, 0.2);
+		transform: translateY(-2px);
+	}
+
+	/* Hero Section */
+	.hero-section {
 		position: relative;
+		min-height: 100dvh;
+		display: flex;
+		align-items: center;
+		padding: 6rem 2rem 2rem;
 		overflow: hidden;
-		background: #0a2e11;
-		color: white;
-		padding: 4rem;
 	}
 
-	@media (min-width: 900px) {
-		.brand-panel {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
+	.hero-container {
+		position: relative;
+		z-index: 10;
+		max-width: 76rem;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 4rem;
+		align-items: center;
+	}
+
+	@media (min-width: 1024px) {
+		.hero-container {
+			grid-template-columns: 1.1fr 0.9fr;
+			padding-top: 2rem;
 		}
 	}
 
 	.mesh-bg {
 		position: absolute;
-		inset: -50%;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
 		background: 
-			radial-gradient(circle at 20% 30%, rgba(27, 94, 32, 0.8) 0%, transparent 50%),
-			radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.6) 0%, transparent 50%),
-			radial-gradient(circle at 50% 10%, rgba(139, 195, 74, 0.4) 0%, transparent 50%);
+			radial-gradient(circle at 60% 40%, rgba(165, 214, 167, 0.4) 0%, transparent 40%),
+			radial-gradient(circle at 40% 60%, rgba(27, 94, 32, 0.08) 0%, transparent 40%),
+			radial-gradient(circle at 80% 20%, rgba(255, 236, 179, 0.3) 0%, transparent 40%);
 		filter: blur(80px);
-		animation: pulseBg 15s ease-in-out infinite alternate;
 		z-index: 0;
+		animation: rotateMesh 40s linear infinite;
 	}
 
-	@keyframes pulseBg {
-		0% { transform: scale(1) translate(0, 0); }
-		100% { transform: scale(1.1) translate(-5%, 5%); }
+	@keyframes rotateMesh {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
 	}
 
-	.brand-content {
-		position: relative;
-		z-index: 1;
-		max-width: 480px;
+	.hero-content {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: left;
 	}
 
-	.logo-badge {
+	@media (max-width: 1023px) {
+		.hero-content {
+			align-items: center;
+			text-align: center;
+		}
+	}
+
+	.hero-badge {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
+		background: #e8f5e9;
+		color: #1b5e20;
 		padding: 0.5rem 1rem;
 		border-radius: 100px;
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 0.875rem;
 		margin-bottom: 2rem;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		border: 1px solid rgba(27, 94, 32, 0.1);
 	}
 
-	.brand-title {
-		font-size: 3.5rem;
+	.pulse-dot {
+		width: 8px;
+		height: 8px;
+		background: #27c93f;
+		border-radius: 50%;
+		box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7);
+		animation: pulseDot 2s infinite;
+	}
+
+	@keyframes pulseDot {
+		0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }
+		70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }
+		100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+	}
+
+	.hero-title {
+		font-size: clamp(3rem, 7vw, 5rem);
 		font-weight: 800;
-		line-height: 1.1;
-		margin: 0 0 1.5rem;
+		color: #111827;
+		line-height: 1.05;
 		letter-spacing: -0.03em;
-		background: linear-gradient(135deg, #ffffff 0%, #a5d6a7 100%);
+		margin: 0 0 1.5rem;
+	}
+
+	.text-gradient {
+		background: linear-gradient(135deg, #1b5e20 0%, #4caf50 100%);
 		-webkit-background-clip: text;
-		background-clip: text;
 		-webkit-text-fill-color: transparent;
+		background-clip: text;
 	}
 
-	.brand-subtitle {
-		font-size: 1.125rem;
+	.hero-desc {
+		font-size: clamp(1.125rem, 2vw, 1.25rem);
+		color: #4b5563;
 		line-height: 1.6;
-		color: rgba(255, 255, 255, 0.8);
-		margin: 0;
+		margin: 0 0 3rem;
+		max-width: 40rem;
 	}
 
-	/* Right Panel */
-	.auth-panel {
-		flex: 1;
+	.hero-actions {
 		display: flex;
-		flex-direction: column;
-		justify-content: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+	}
+
+	@media (max-width: 1023px) {
+		.hero-actions {
+			justify-content: center;
+		}
+	}
+
+	.btn-primary {
+		display: inline-flex;
 		align-items: center;
-		padding: 2rem;
-		background: #ffffff;
-		position: relative;
+		justify-content: center;
+		gap: 0.75rem;
+		background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+		color: white;
+		border: none;
+		padding: 1.125rem 2.5rem;
+		border-radius: 100px;
+		font-size: 1.125rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.25);
+		text-decoration: none;
 	}
 
-	.auth-container {
+	.btn-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 12px 32px rgba(27, 94, 32, 0.35);
+	}
+
+	.btn-primary .arrow {
+		transition: transform 0.3s;
+	}
+
+	.btn-primary:hover .arrow {
+		transform: translateX(4px);
+	}
+
+	.btn-secondary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		color: #111827;
+		border: 2px solid #e5e7eb;
+		padding: 1.125rem 2.5rem;
+		border-radius: 100px;
+		font-size: 1.125rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		text-decoration: none;
+	}
+
+	.btn-secondary:hover {
+		border-color: #1b5e20;
+		color: #1b5e20;
+		background: rgba(27, 94, 32, 0.05);
+	}
+
+	/* Mockup Window on Right Side */
+	.hero-visual {
 		width: 100%;
-		max-width: 420px;
-	}
-
-	.tabs-container {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 3rem;
+		position: relative;
 	}
 
-	.tabs-bg {
-		display: flex;
-		background: #f4f4f0;
-		border-radius: 100px;
-		padding: 4px;
-		position: relative;
+	.mockup-window {
 		width: 100%;
-		max-width: 280px;
-	}
-
-	.tab-btn {
-		flex: 1;
-		padding: 0.75rem 1.5rem;
-		border: none;
-		background: transparent;
-		font-weight: 600;
-		font-size: 0.9375rem;
-		color: #71716e;
-		cursor: pointer;
+		max-width: 24rem;
+		background: rgba(255, 255, 255, 0.6);
+		backdrop-filter: blur(24px);
+		-webkit-backdrop-filter: blur(24px);
+		border-radius: 24px;
+		border: 1px solid rgba(255, 255, 255, 0.8);
+		box-shadow: 
+			0 24px 48px rgba(0, 0, 0, 0.05),
+			inset 0 1px 0 rgba(255, 255, 255, 1);
 		position: relative;
-		z-index: 2;
-		transition: color 0.3s;
+		overflow: hidden;
+		transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+		transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	
+	.mockup-window:hover {
+		transform: perspective(1000px) rotateY(0) rotateX(0) scale(1.02);
 	}
 
-	.tab-btn.active {
-		color: #1b5e20;
-	}
-
-	.tab-indicator {
+	.glow-effect {
 		position: absolute;
-		top: 4px;
-		bottom: 4px;
-		width: calc(50% - 4px);
-		background: #ffffff;
-		border-radius: 100px;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		background: radial-gradient(circle at 50% 50%, rgba(27, 94, 32, 0.05) 0%, transparent 60%);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.mockup-header {
+		display: flex;
+		gap: 0.5rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		position: relative;
 		z-index: 1;
-		transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.26, 1.55);
 	}
 
-	.tab-indicator.login {
-		transform: translateX(0);
+	.mockup-header .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
 	}
 
-	.tab-indicator.register {
-		transform: translateX(100%);
-	}
-
-	.auth-header {
-		margin-bottom: 2.5rem;
-		text-align: center;
-	}
-
-	.auth-header h2 {
-		font-size: 1.875rem;
-		font-weight: 800;
-		color: #1c1c1a;
-		margin: 0 0 0.5rem;
-		letter-spacing: -0.02em;
-	}
-
-	.auth-header p {
-		font-size: 0.9375rem;
-		color: #71716e;
-		margin: 0;
-	}
-
-	.auth-form {
+	.mockup-body {
+		padding: 1.5rem;
+		position: relative;
+		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 1rem;
 	}
 
-	.input-container {
-		position: relative;
+	.m-title {
+		font-weight: 800;
+		color: #111827;
+		font-size: 1.125rem;
 		margin-bottom: 0.5rem;
 	}
 
-	.input-container input {
-		width: 100%;
-		padding: 1.25rem 1rem 0.5rem;
-		border: none;
-		background: #f8f9fa;
-		border-radius: 12px 12px 0 0;
-		font-size: 1rem;
-		color: #1c1c1a;
-		transition: background 0.3s;
-		box-sizing: border-box;
-	}
-
-	.input-container input:focus {
-		outline: none;
-		background: #e8f5e9;
-	}
-
-	.input-container label {
-		position: absolute;
-		left: 1rem;
-		top: 50%;
-		transform: translateY(-50%);
-		font-size: 1rem;
-		color: #71716e;
-		pointer-events: none;
-		transition: all 0.2s ease;
-	}
-
-	.input-container input:focus + label,
-	.input-container input:not(:placeholder-shown) + label {
-		top: 0.5rem;
-		transform: translateY(0);
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #1b5e20;
-	}
-
-	.input-line {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 2px;
-		background: #dadad6;
-		transition: all 0.3s;
-	}
-
-	.input-container input:focus ~ .input-line {
-		background: #1b5e20;
-		height: 3px;
-	}
-
-	.role-selector {
-		margin-top: 0.5rem;
-	}
-
-	.role-label {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #1c1c1a;
-		margin: 0 0 1rem;
-	}
-
-	.role-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
-	}
-
-	.role-card {
-		position: relative;
+	.mockup-card {
 		display: flex;
-		align-items: flex-start;
+		align-items: center;
 		gap: 1rem;
+		background: white;
 		padding: 1rem;
 		border-radius: 16px;
-		border: 2px solid #f4f4f0;
-		background: #ffffff;
-		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.02);
 	}
 
-	.role-card input {
-		display: none;
-	}
-
-	.role-card:hover {
-		border-color: #a5d6a7;
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.08);
-	}
-
-	.role-card.selected {
-		border-color: #1b5e20;
-		background: #f2fcf3;
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.12);
-	}
-
-	.role-icon {
-		font-size: 1.75rem;
+	.mc-icon {
+		font-size: 1.5rem;
+		width: 3rem;
+		height: 3rem;
 		background: #f4f4f0;
-		width: 48px;
-		height: 48px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 12px;
-		transition: background 0.3s;
-		flex-shrink: 0;
 	}
 
-	.role-card.selected .role-icon {
-		background: #ffffff;
-	}
-
-	.role-text {
+	.mc-info {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
 	}
 
-	.role-title {
-		font-weight: 700;
-		color: #1c1c1a;
-		font-size: 1rem;
-	}
-
-	.role-desc {
+	.mc-label {
 		font-size: 0.75rem;
-		color: #71716e;
+		font-weight: 600;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
-	.role-card.selected .role-title {
+	.mc-val {
+		font-size: 0.9375rem;
+		font-weight: 700;
+		color: #111827;
+	}
+
+	.text-green { color: #1b5e20; }
+	.font-mono { font-family: monospace; letter-spacing: 0; color: #4b5563; }
+
+	/* Sections Common */
+	.section-container {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 6rem 2rem;
+	}
+
+	.section-header {
+		text-align: center;
+		margin-bottom: 4rem;
+	}
+
+	.section-title {
+		font-size: 2.5rem;
+		font-weight: 800;
+		color: #111827;
+		margin: 0 0 1rem;
+		letter-spacing: -0.02em;
+	}
+
+	.section-subtitle {
+		font-size: 1.125rem;
+		color: #6b7280;
+		max-width: 36rem;
+		margin: 0 auto;
+		line-height: 1.6;
+	}
+
+	/* Features Grid */
+	.features-section {
+		background: white;
+		position: relative;
+	}
+
+	.features-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 2rem;
+	}
+
+	.feature-card {
+		background: #faf9f5;
+		padding: 3rem 2rem;
+		border-radius: 24px;
+		transition: all 0.3s ease;
+		border: 1px solid transparent;
+	}
+
+	.feature-card:hover {
+		background: white;
+		border-color: rgba(27, 94, 32, 0.1);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+		transform: translateY(-4px);
+	}
+
+	.feature-icon {
+		font-size: 3rem;
+		margin-bottom: 1.5rem;
+		background: #e8f5e9;
+		width: 5rem;
+		height: 5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 20px;
+	}
+
+	.feature-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #111827;
+		margin: 0 0 1rem;
+	}
+
+	.feature-desc {
+		color: #4b5563;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	/* How It Works */
+	.how-it-works {
+		background: #faf9f5;
+	}
+
+	.steps-container {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.steps-container {
+			flex-direction: column;
+			gap: 3rem;
+		}
+		.step-connector { display: none; }
+	}
+
+	.step {
+		flex: 1;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.step-number {
+		width: 4rem;
+		height: 4rem;
+		background: #1b5e20;
+		color: white;
+		font-size: 1.5rem;
+		font-weight: 800;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 1.5rem;
+		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.2);
+	}
+
+	.step-content h4 {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: #111827;
+		margin: 0 0 0.5rem;
+	}
+
+	.step-content p {
+		color: #6b7280;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.step-connector {
+		flex: 0.5;
+		height: 2px;
+		background: repeating-linear-gradient(90deg, #d1d5db 0, #d1d5db 4px, transparent 4px, transparent 8px);
+		margin-top: 2rem;
+	}
+
+	/* CTA Section */
+	.cta-section {
+		padding: 4rem 2rem 8rem;
+		background: white;
+	}
+
+	.cta-box {
+		max-width: 64rem;
+		margin: 0 auto;
+		background: linear-gradient(135deg, #1b5e20 0%, #144d18 100%);
+		border-radius: 32px;
+		padding: 4rem 2rem;
+		text-align: center;
+		color: white;
+		box-shadow: 0 24px 48px rgba(27, 94, 32, 0.2);
+	}
+
+	.cta-box h2 {
+		font-size: 2.5rem;
+		font-weight: 800;
+		margin: 0 0 1rem;
+		letter-spacing: -0.02em;
+	}
+
+	.cta-box p {
+		font-size: 1.125rem;
+		opacity: 0.9;
+		max-width: 36rem;
+		margin: 0 auto 2.5rem;
+		line-height: 1.6;
+	}
+
+	.btn-large {
+		padding: 1.25rem 3rem;
+		font-size: 1.25rem;
+		background: white;
 		color: #1b5e20;
 	}
 
-	.check-circle {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-		border: 2px solid #dadad6;
-		transition: all 0.3s;
-		box-sizing: border-box;
-	}
-
-	.role-card.selected .check-circle {
-		border-color: #1b5e20;
-		background: #1b5e20;
-	}
-
-	.role-card.selected .check-circle::after {
-		content: '';
-		position: absolute;
-		left: 5px;
-		top: 2px;
-		width: 4px;
-		height: 8px;
-		border: solid white;
-		border-width: 0 2px 2px 0;
-		transform: rotate(45deg);
-	}
-
-	.submit-btn {
-		position: relative;
-		margin-top: 1.5rem;
-		padding: 1.25rem;
-		background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-		color: #ffffff;
-		border: none;
-		border-radius: 100px;
-		font-size: 1.0625rem;
-		font-weight: 700;
-		cursor: pointer;
-		overflow: hidden;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.25);
-	}
-
-	.submit-btn::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-		opacity: 0;
-		transition: opacity 0.3s;
-		z-index: 0;
-	}
-
-	.submit-btn:hover:not(:disabled) {
+	.btn-large:hover {
+		background: #f4f4f0;
 		transform: translateY(-2px);
-		box-shadow: 0 12px 32px rgba(27, 94, 32, 0.35);
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 	}
 
-	.submit-btn:hover:not(:disabled)::before {
-		opacity: 1;
+	/* Footer */
+	.footer {
+		background: #f4f4f0;
+		padding: 2rem 0;
+		text-align: center;
 	}
 
-	.submit-btn:active:not(:disabled) {
-		transform: translateY(1px);
-	}
-
-	.submit-btn:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-		transform: none;
-		box-shadow: none;
-	}
-
-	.btn-text {
-		position: relative;
-		z-index: 1;
-	}
-
-	.submit-btn.loading .btn-text {
-		opacity: 0;
-	}
-
-	.spinner {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 1.5rem;
-		height: 1.5rem;
-		border: 3px solid rgba(255, 255, 255, 0.3);
-		border-radius: 50%;
-		border-top-color: #ffffff;
-		animation: spin 0.8s linear infinite;
-		z-index: 2;
-	}
-
-	@keyframes spin {
-		to { transform: translate(-50%, -50%) rotate(360deg); }
-	}
-
-	.error-toast {
+	.footer-content {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 0 2rem;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		gap: 0.75rem;
-		background: #ffebee;
-		color: #d32f2f;
-		padding: 1rem;
-		border-radius: 12px;
-		font-size: 0.875rem;
-		font-weight: 500;
-		border-left: 4px solid #d32f2f;
+		gap: 0.5rem;
 	}
 
-	.error-icon {
+	.footer-brand {
 		font-size: 1.25rem;
+		font-weight: 800;
+		color: #1b5e20;
+	}
+
+	.footer-copy {
+		color: #6b7280;
+		font-size: 0.875rem;
 	}
 
 	/* Animations */
 	.animate-fade-in-up {
-		animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-	}
-
-	.animate-slide-up-slow {
-		animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-	}
-
-	.animate-expand {
-		animation: expandY 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-		overflow: hidden;
-	}
-
-	.animate-shake {
-		animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+		animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		opacity: 0;
 	}
 
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(30px); }
+		from { opacity: 0; transform: translateY(40px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
-	@keyframes expandY {
-		from { opacity: 0; max-height: 0; transform: translateY(-10px); }
-		to { opacity: 1; max-height: 200px; transform: translateY(0); }
-	}
+	.animate-float-1 { animation: float 6s ease-in-out infinite; }
+	.animate-float-2 { animation: float 7s ease-in-out infinite 1s; }
+	.animate-float-3 { animation: float 8s ease-in-out infinite 2s; }
 
-	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
+	@keyframes float {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-20px); }
 	}
 </style>
