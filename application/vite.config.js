@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
@@ -18,5 +19,14 @@ export default defineConfig({
 			// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 			adapter: adapter()
 		})
-	]
+	],
+	test: {
+		include: ['src/**/*.test.js'],
+		globals: false,
+		alias: {
+			$lib: '/src/lib',
+			'$lib/': '/src/lib/',
+			'$env/dynamic/private': '/src/lib/__mocks__/env-private.js'
+		}
+	}
 });
