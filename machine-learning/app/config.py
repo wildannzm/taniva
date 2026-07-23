@@ -24,16 +24,16 @@ YOLO_CONFIDENCE = float(os.getenv("YOLO_CONFIDENCE", "0.25"))
 YOLO_IOU_THRESHOLD = float(os.getenv("YOLO_IOU_THRESHOLD", "0.45"))
 
 # Class names expected from the trained YOLOv8 model
-CLASS_FRESH = "fresh"
-CLASS_ROTTEN = "rotten"
+CLASS_FRESH = "tomat_segar"
+CLASS_ROTTEN = "tomat_busuk"
 VALID_CLASSES = {CLASS_FRESH, CLASS_ROTTEN}
 
 # ─── Quality Labels ──────────────────────────────────────
 
 QUALITY_THRESHOLDS = {
-    "fresh": (80, 100),
-    "mixed": (50, 79),
-    "rotten": (0, 49),
+    "segar": (80, 100),
+    "campuran": (50, 79),
+    "busuk": (0, 49),
 }
 
 # ─── Preprocessing ───────────────────────────────────────
