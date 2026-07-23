@@ -140,7 +140,7 @@ class TomatoDetector:
             return {
                 "success": False,
                 "error": "NO_TOMATO_DETECTED",
-                "message": "No tomatoes were detected in the image.",
+                "message": "Tidak ada tomat yang terdeteksi pada gambar.",
                 "freshCount": 0,
                 "rottenCount": 0,
                 "totalDetected": 0,
@@ -214,4 +214,4 @@ class TomatoDetector:
         for label, (low, high) in QUALITY_THRESHOLDS.items():
             if low <= score <= high:
                 return label
-        return "rotten"
+        return "busuk"

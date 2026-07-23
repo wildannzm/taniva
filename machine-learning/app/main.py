@@ -80,13 +80,57 @@ async def health():
     }
 
 
-@app.post("/predict")
+@app.post(
+    "/predict",
+    responses={
+        200: {
+            "description": "Prediction completed (check `sukses` field for result status)",
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "success": {
+                            "summary": "Tomat terdeteksi",
+                            "value": {
+                                "success": True,
+                                "qualityScore": 75,
+                                "qualityLabel": "campuran",
+                                "freshCount": 3,
+                                "rottenCount": 1,
+                                "totalDetected": 4,
+                                "annotatedImageUrl": "/results/result-abc123.jpg",
+                                "inferenceTimeMs": 120,
+                                "detections": [],
+                            },
+                        },
+                        "no_detection": {
+                            "summary": "Tidak ada tomat",
+                            "value": {
+                                "success": False,
+                                "error": "NO_TOMATO_DETECTED",
+                                "message": "Tidak ada tomat yang terdeteksi pada gambar.",
+                                "freshCount": 0,
+                                "rottenCount": 0,
+                                "totalDetected": 0,
+                                "inferenceTimeMs": 95,
+                                "detections": [],
+                            },
+                        },
+                    }
+                }
+            },
+        },
+    },
+)
 async def predict(image: UploadFile = File(...)):
     """
     Analyze a tomato image for quality grading.
 
     Accepts: multipart/form-data with `image` field.
     Returns: quality score, label, detection counts, and annotated image URL.
+
+    **Note:** Always returns HTTP 200. Check `success` field in the response body
+    to determine if tomatoes were detected. When `success` is `false`, the
+    response includes `error` and `message` fields.
 
     Response contract matches ARCHITECTURE.md §8.
     """
@@ -154,9 +198,12 @@ async def predict(image: UploadFile = File(...)):
         )
 
     # ─── Handle no detection ──────────────────────────
+    # Return 200 with success=false — the request was valid,
+    # the model simply found no tomatoes. 422 is reserved for
+    # FastAPI's own request-validation errors.
 
     if not result.get("success"):
-        return JSONResponse(status_code=422, content=result)
+        return JSONResponse(status_code=200, content=result)
 
     # ─── Annotate and save ────────────────────────────
 
