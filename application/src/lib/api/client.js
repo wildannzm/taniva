@@ -1,147 +1,118 @@
 // src/lib/api/client.js
-import {
-	mockUploadResponse,
-	mockVerifyResponse,
-	mockExtractIntentResponse,
-	mockSearchResponse,
-	mockRouteResponse,
-	mockRatingResponse,
-	mockReputationResponse,
-	delay
-} from './mock.js';
-
-// Toggle this to false when connecting to real backend
-const USE_MOCK = true;
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 /**
- * Upload harvest photo for grading
- * @param {File} file 
- * @param {string} farmer_id 
+ * Base API Client Fetcher
+ * Menangani request ke server dengan standar response envelope Taniva.
  */
-export async function uploadHarvest(file, farmer_id) {
-	if (USE_MOCK) {
-		await delay(2500); // simulate CV processing
-		return mockUploadResponse;
-	}
-	
-	const formData = new FormData();
-	formData.append('file', file);
-	formData.append('farmer_id', farmer_id);
 
-	const res = await fetch(`${BASE_URL}/api/harvest/upload`, {
-		method: 'POST',
-		body: formData
-	});
-	if (!res.ok) throw new Error('Gagal mengupload foto panen');
-	return res.json();
+const BASE_URL = ''; // Relative path, same-origin dengan SvelteKit server
+
+/**
+ * @typedef {Object} FetchOptions
+ * @property {string} [method='GET']
+ * @property {Object} [headers={}]
+ * @property {any} [body]
+ * @property {AbortSignal} [signal]
+ * @property {boolean} [isMultipart=false]
+ */
+
+/**
+ * Memetakan error fetch mentah (Network Error, CORS, dll) ke pesan user-friendly
+ * tanpa mengekspos stack trace.
+ * @param {Error} error
+ * @returns {Error}
+ */
+function mapNetworkError(error) {
+	if (error.name === 'AbortError') {
+		return new Error('Permintaan dibatalkan.');
+	}
+	if (
+		error.message.includes('Failed to fetch') ||
+		error.message.includes('NetworkError') ||
+		error.message.includes('fetch')
+	) {
+		return new Error('Koneksi terputus. Pastikan perangkat terhubung ke internet.');
+	}
+	return new Error('Terjadi kesalahan pada sistem. Silakan coba lagi nanti.');
 }
 
 /**
- * Verify harvest certificate via batch ID (from QR)
- * @param {string} batch_id 
+ * Fungsi inti untuk melakukan request API
+ * @param {string} endpoint - Path endpoint (misal: '/api/health')
+ * @param {FetchOptions} [options] - Konfigurasi fetch
+ * @returns {Promise<{data: any, meta?: any, requestId: string|null, status: number}>}
  */
-export async function verifyHarvest(batch_id) {
-	if (USE_MOCK) {
-		await delay(1000);
-		return mockVerifyResponse;
+export async function apiFetch(endpoint, options = {}) {
+	const { method = 'GET', headers = {}, body, signal, isMultipart = false } = options;
+
+	/** @type {any} */
+	const config = {
+		method,
+		headers: { ...headers },
+		signal,
+	};
+
+	if (body) {
+		if (isMultipart) {
+			// Jika multipart (FormData), browser otomatis mengatur Content-Type beserta boundary
+			config.body = body;
+			delete config.headers['Content-Type'];
+		} else {
+			config.headers['Content-Type'] = 'application/json';
+			config.body = JSON.stringify(body);
+		}
 	}
 
-	const res = await fetch(`${BASE_URL}/api/harvest/${batch_id}/verify`);
-	if (!res.ok) throw new Error('Gagal memverifikasi sertifikat');
-	return res.json();
-}
-
-/**
- * Extract intent from natural language
- * @param {string} text 
- */
-export async function extractIntent(text) {
-	if (USE_MOCK) {
-		await delay(3000); // simulate NLP processing
-		return mockExtractIntentResponse;
+	/** @type {Response} */
+	let response;
+	try {
+		// Mutasi (POST/PUT/PATCH/DELETE) TIDAK boleh di auto-retry untuk mencegah aksi ganda
+		response = await fetch(`${BASE_URL}${endpoint}`, config);
+	} catch (error) {
+		// Pemetaan network error murni (fetch gagal total, bukan HTTP error)
+		throw mapNetworkError(/** @type {Error} */ (error));
 	}
 
-	const res = await fetch(`${BASE_URL}/api/nlp/extract-intent`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ text })
-	});
-	if (!res.ok) throw new Error('Gagal memproses permintaan AI');
-	return res.json();
-}
+	// Simpan Request ID dari header untuk tracking
+	const requestId =
+		response.headers.get('x-request-id') ||
+		response.headers.get('x-ray-id') ||
+		null;
 
-/**
- * Search and match farmers
- * @param {Object} criteria 
- */
-export async function searchMatching(criteria) {
-	if (USE_MOCK) {
-		await delay(1500);
-		return mockSearchResponse;
+	/** @type {any} */
+	let data;
+	try {
+		data = await response.json();
+	} catch (e) {
+		// Menangani invalid JSON (misal 502 Bad Gateway berupa HTML)
+		throw new Error('Respons dari server tidak valid (Format data tidak dikenali).');
 	}
 
-	const res = await fetch(`${BASE_URL}/api/matching/search`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(criteria)
-	});
-	if (!res.ok) throw new Error('Gagal mencari petani');
-	return res.json();
-}
-
-/**
- * Get route estimate
- * @param {string} farmer_id 
- * @param {Object} umkm_lokasi 
- */
-export async function getRouteEstimate(farmer_id, umkm_lokasi) {
-	if (USE_MOCK) {
-		await delay(800);
-		return mockRouteResponse;
+	// Validasi standard Envelope Taniva pada HTTP error
+	if (!response.ok) {
+		let errorMsg = data.error || data.message || 'Terjadi kesalahan saat memproses permintaan.';
+		if (typeof errorMsg !== 'string') {
+			errorMsg = errorMsg.message || JSON.stringify(errorMsg);
+		}
+		/** @type {any} */
+		const errorObj = new Error(errorMsg);
+		errorObj.status = response.status;
+		errorObj.requestId = requestId;
+		throw errorObj;
 	}
 
-	const res = await fetch(`${BASE_URL}/api/logistics/route`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ farmer_id, umkm_lokasi })
-	});
-	if (!res.ok) throw new Error('Gagal menghitung rute');
-	return res.json();
-}
-
-/**
- * Submit UMKM rating for a farmer
- * @param {string} order_id 
- * @param {number} nilai 
- * @param {string} catatan 
- */
-export async function submitRating(order_id, nilai, catatan) {
-	if (USE_MOCK) {
-		await delay(1200);
-		return mockRatingResponse;
+	// Cek envelope { success: false } pada HTTP 200 (edge case)
+	if (data && typeof data.success !== 'undefined' && !data.success) {
+		/** @type {any} */
+		const errorObj = new Error(data.error || 'Terjadi kesalahan');
+		errorObj.requestId = requestId;
+		throw errorObj;
 	}
 
-	const res = await fetch(`${BASE_URL}/api/feedback/rating`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ order_id, nilai, catatan })
-	});
-	if (!res.ok) throw new Error('Gagal mengirim ulasan');
-	return res.json();
-}
-
-/**
- * Get farmer reputation
- * @param {string} farmer_id 
- */
-export async function getFarmerReputation(farmer_id) {
-	if (USE_MOCK) {
-		await delay(800);
-		return mockReputationResponse;
-	}
-
-	const res = await fetch(`${BASE_URL}/api/farmer/${farmer_id}/reputation`);
-	if (!res.ok) throw new Error('Gagal mengambil reputasi');
-	return res.json();
+	return {
+		data: data.data !== undefined ? data.data : data,
+		meta: data.meta,
+		requestId,
+		status: response.status,
+	};
 }

@@ -28,7 +28,7 @@ export class YoloService {
 		}
 
 		const formData = new FormData();
-		formData.append('file', imageFile);
+		formData.append('image', imageFile);
 
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), config.YOLO_TIMEOUT_MS);
@@ -97,7 +97,7 @@ export class YoloService {
 		if (qualityScore === undefined || qualityScore === null) {
 			qualityScore = Math.round((freshCount / totalDetected) * 100);
 		}
-		
+
 		qualityScore = Math.max(0, Math.min(100, Number(qualityScore)));
 
 		/** @type {'fresh' | 'mixed' | 'rotten'} */
@@ -124,7 +124,7 @@ export class YoloService {
 		const rottenCount = 2;
 		const totalDetected = freshCount + rottenCount;
 		const qualityScore = Math.round((freshCount / totalDetected) * 100);
-		
+
 		/** @type {'fresh' | 'mixed' | 'rotten'} */
 		let qualityLabel;
 		if (qualityScore >= 80) qualityLabel = 'fresh';

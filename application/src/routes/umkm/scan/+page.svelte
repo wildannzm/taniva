@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { userRole } from '$lib/stores/app.js';
-	import { verifyHarvest } from '$lib/api/client.js';
+	import { verifyHarvest } from '$lib/api/harvest.api.js';
 	
 	import QRScanner from '$lib/components/QRScanner.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
@@ -21,9 +21,9 @@
 		error = null;
 		
 		try {
-			const res = await verifyHarvest(batchId);
-			verifyResult = res;
-			currentStep = res.valid ? 'valid' : 'invalid';
+			const { data } = await verifyHarvest(batchId);
+			verifyResult = data;
+			currentStep = data.valid ? 'valid' : 'invalid';
 		} catch (/** @type {any} */ err) {
 			error = err.message;
 			currentStep = 'scan';

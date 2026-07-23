@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { userRole, transactionState } from '$lib/stores/app.js';
-	import { extractIntent } from '$lib/api/client.js';
+	import { extractIntent } from '$lib/api/nlp.api.js';
 	
 	import NaturalLanguageInput from '$lib/components/NaturalLanguageInput.svelte';
 	import ExtractedIntentConfirm from '$lib/components/ExtractedIntentConfirm.svelte';
@@ -20,8 +20,8 @@
 		error = null;
 		
 		try {
-			const res = await extractIntent(text);
-			intentData = res;
+			const { data } = await extractIntent(text);
+			intentData = data;
 			currentStep = 'confirm';
 		} catch (/** @type {any} */ err) {
 			error = err.message;

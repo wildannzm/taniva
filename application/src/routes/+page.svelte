@@ -8,14 +8,32 @@
 	<div class="nav-wrapper">
 		<nav class="acctual-nav">
 			<div class="logo">
-				<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="logo-icon"><path d="M12 4L4 20h16L12 4z"/></svg>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					class="logo-icon"><path d="M12 4L4 20h16L12 4z" /></svg
+				>
 				<span>Taniva</span>
 			</div>
 			<div class="nav-links">
 				<a href="#features" class="nav-ghost">Platform</a>
 				<a href="#how" class="nav-ghost">How it works</a>
 				{#if data.user}
-					<button class="btn-acctual-primary" onclick={() => goto(data.user?.role === 'ADMIN' ? '/admin' : data.user?.role === 'UMKM' ? '/umkm' : '/petani')}>Dashboard</button>
+					<button
+						class="btn-login"
+						onclick={() =>
+							goto(
+								data.user.role === 'ADMIN'
+									? '/admin'
+									: data.user.role === 'UMKM'
+										? '/umkm'
+										: '/petani'
+							)}>Dashboard</button
+					>
 				{:else}
 					<button class="nav-ghost" onclick={() => goto('/login')}>Log in</button>
 					<button class="btn-acctual-primary" onclick={() => goto('/login')}>Get started</button>
@@ -30,30 +48,50 @@
 			<div class="hero-text-block">
 				<div class="hero-badge">
 					<span class="badge-icon">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--color-electric-blue)"><circle cx="12" cy="12" r="10"/></svg>
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--color-electric-blue)"
+							><circle cx="12" cy="12" r="10" /></svg
+						>
 					</span>
 					Taniva 2.0 telah hadir
 				</div>
-				<h1 class="hero-title">
-					Lapisan kepercayaan terpadu untuk pertanian lokal.
-				</h1>
+				<h1 class="hero-title">Lapisan kepercayaan terpadu untuk pertanian lokal.</h1>
 				<p class="hero-desc">
-					Verifikasi kualitas panen seketika dengan AI dan simpan datanya secara aman. Cara termudah bagi Petani dan UMKM kuliner bertransaksi dengan keyakinan penuh.
+					Verifikasi kualitas panen seketika dengan AI dan simpan datanya secara aman. Cara termudah
+					bagi Petani dan UMKM kuliner bertransaksi dengan keyakinan penuh.
 				</p>
 				<div class="hero-actions">
 					{#if data.user}
-						<button class="btn-acctual-primary btn-lg" onclick={() => goto(data.user?.role === 'ADMIN' ? '/admin' : data.user?.role === 'UMKM' ? '/umkm' : '/petani')}>Ke Dashboard</button>
+						<button
+							class="btn-primary"
+							onclick={() =>
+								goto(
+									data.user.role === 'ADMIN'
+										? '/admin'
+										: data.user.role === 'UMKM'
+											? '/umkm'
+											: '/petani'
+								)}
+						>
+							Dashboard
+							<span class="arrow">→</span>
+						</button>
 					{:else}
-						<button class="btn-acctual-primary btn-lg" onclick={() => goto('/login')}>Mulai Gratis</button>
+						<button class="btn-acctual-primary btn-lg" onclick={() => goto('/login')}
+							>Mulai Gratis</button
+						>
 					{/if}
-					<button class="btn-acctual-secondary btn-lg" onclick={() => document.getElementById('features').scrollIntoView()}>Pelajari Fitur</button>
+					<button
+						class="btn-acctual-secondary btn-lg"
+						onclick={() => document.getElementById('features').scrollIntoView()}
+						>Pelajari Fitur</button
+					>
 				</div>
 				<div class="hero-rate-badge">
 					<span class="rate-icon">✓</span>
 					<span class="rate-text">Verifikasi AI <strong>99.8%</strong></span>
 				</div>
 			</div>
-			
+
 			<div class="hero-visual-block">
 				<!-- Invoice/Certificate Mockup -->
 				<div class="acctual-mockup-stack">
@@ -66,7 +104,19 @@
 						<div class="acctual-card-body">
 							<div class="vendor-block">
 								<div class="vendor-icon icon-iris">
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle
+											cx="12"
+											cy="7"
+											r="4"
+										/></svg
+									>
 								</div>
 								<div class="vendor-info">
 									<span class="v-label">DARI</span>
@@ -102,30 +152,68 @@
 		<div class="acctual-section-container">
 			<div class="acctual-section-header">
 				<h2 class="acctual-section-title">Kenapa Memilih Taniva?</h2>
-				<p class="acctual-section-subtitle">Kami membawa transparansi penuh ke dalam rantai pasok pertanian lokal Anda.</p>
+				<p class="acctual-section-subtitle">
+					Kami membawa transparansi penuh ke dalam rantai pasok pertanian lokal Anda.
+				</p>
 			</div>
-			
+
 			<div class="acctual-features-grid">
 				<div class="acctual-feature-card">
 					<div class="acctual-feature-icon">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M5 10h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><path d="M8 14h.01"/><path d="M16 14h.01"/><path d="M8 18h8"/></svg>
+						<svg
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" /><path
+								d="M5 10h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"
+							/><path d="M8 14h.01" /><path d="M16 14h.01" /><path d="M8 18h8" /></svg
+						>
 					</div>
 					<h3 class="acctual-feature-title">Computer Vision AI</h3>
-					<p class="acctual-feature-desc">Tidak perlu lagi menebak kualitas. AI kami memindai dan memberikan skor objektivitas kualitas hasil panen secara otomatis.</p>
+					<p class="acctual-feature-desc">
+						Tidak perlu lagi menebak kualitas. AI kami memindai dan memberikan skor objektivitas
+						kualitas hasil panen secara otomatis.
+					</p>
 				</div>
 				<div class="acctual-feature-card">
 					<div class="acctual-feature-icon">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+						<svg
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path
+								d="M7 11V7a5 5 0 0 1 10 0v4"
+							/></svg
+						>
 					</div>
 					<h3 class="acctual-feature-title">Jejak Digital Aman</h3>
-					<p class="acctual-feature-desc">Setiap panen dicatat ke dalam sistem terpusat. UMKM dapat memindai QR code untuk memverifikasi orisinalitas langsung dari kebun.</p>
+					<p class="acctual-feature-desc">
+						Setiap panen dicatat ke dalam sistem terpusat. UMKM dapat memindai QR code untuk
+						memverifikasi orisinalitas langsung dari kebun.
+					</p>
 				</div>
 				<div class="acctual-feature-card">
 					<div class="acctual-feature-icon">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+						<svg
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg
+						>
 					</div>
 					<h3 class="acctual-feature-title">Reputasi Terpercaya</h3>
-					<p class="acctual-feature-desc">Bangun rekam jejak yang solid. Petani berkualitas akan selalu direkomendasikan kepada UMKM yang mencari bahan baku terbaik.</p>
+					<p class="acctual-feature-desc">
+						Bangun rekam jejak yang solid. Petani berkualitas akan selalu direkomendasikan kepada
+						UMKM yang mencari bahan baku terbaik.
+					</p>
 				</div>
 			</div>
 		</div>
@@ -137,7 +225,7 @@
 			<div class="acctual-section-header">
 				<h2 class="acctual-section-title">Cara Kerja Ekosistem</h2>
 			</div>
-			
+
 			<div class="acctual-steps">
 				<div class="acctual-step">
 					<div class="step-num">1</div>
@@ -162,7 +250,9 @@
 	<section class="acctual-cta-section">
 		<div class="acctual-cta-box">
 			<h2 class="cta-title">Tingkatkan Standar Bisnis Anda</h2>
-			<p class="cta-desc">Bergabunglah dengan ribuan Petani dan UMKM di Solo Raya yang telah menggunakan Taniva.</p>
+			<p class="cta-desc">
+				Bergabunglah dengan ribuan Petani dan UMKM di Solo Raya yang telah menggunakan Taniva.
+			</p>
 			<button class="btn-cta-green" onclick={() => goto('/login')}>Daftar Gratis Sekarang</button>
 		</div>
 	</section>
@@ -171,7 +261,14 @@
 	<footer class="acctual-footer">
 		<div class="footer-content">
 			<div class="footer-logo">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 4L4 20h16L12 4z"/></svg>
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"><path d="M12 4L4 20h16L12 4z" /></svg
+				>
 				<span>Taniva</span>
 			</div>
 			<div class="footer-links">
@@ -473,8 +570,10 @@
 		justify-content: center;
 		color: white;
 	}
-	
-	.icon-iris { background: var(--color-iris); }
+
+	.icon-iris {
+		background: var(--color-iris);
+	}
 
 	.vendor-info {
 		display: flex;
@@ -784,16 +883,33 @@
 	}
 
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(40px); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(40px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
-	.animate-float-1 { animation: float 6s ease-in-out infinite; }
-	.animate-float-2 { animation: float 7s ease-in-out infinite 1s; }
-	.animate-float-3 { animation: float 8s ease-in-out infinite 2s; }
+	.animate-float-1 {
+		animation: float 6s ease-in-out infinite;
+	}
+	.animate-float-2 {
+		animation: float 7s ease-in-out infinite 1s;
+	}
+	.animate-float-3 {
+		animation: float 8s ease-in-out infinite 2s;
+	}
 
 	@keyframes float {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-20px); }
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-20px);
+		}
 	}
 </style>
