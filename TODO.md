@@ -42,9 +42,9 @@
 - [x] Implementasikan endpoint `POST /api/harvest/upload` (integrasi fungsi CV dari Abrar + generate hash SHA-256 + QR code) — FR-04, FR-08
 - [x] Implementasikan endpoint `GET /api/harvest/{batch_id}/verify` — FR-09
 - [x] Implementasikan algoritma Weighted Scoring (kualitas 40%, reputasi 35%, logistik 25%) di endpoint `POST /api/matching/search` — FR-10, FR-11, FR-12
-- [ ] Implementasikan endpoint `POST /api/feedback/rating` dan logika update reputasi otomatis — FR-16, FR-17
-- [ ] Implementasikan endpoint `GET /api/farmer/{id}/reputation`
-- [ ] Buat seed data dummy (beberapa petani, UMKM, batch panen) untuk kebutuhan demo dan testing
+- [x] Implementasikan endpoint `POST /api/feedback/rating` dan logika update reputasi otomatis — FR-16, FR-17
+- [x] Implementasikan endpoint `GET /api/farmer/{id}/reputation`
+- [x] Buat seed data dummy (beberapa petani, UMKM, batch panen) untuk kebutuhan demo dan testing
 - [ ] Tulis dokumentasi ringkas kontrak API (request/response) agar Zacky bisa integrasi tanpa menunggu
 
 ### Zacky Hafsari — Frontend Lead
