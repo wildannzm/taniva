@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	let { data } = $props();
 </script>
 
 <div class="landing-page">
@@ -8,7 +9,11 @@
 		<div class="nav-content">
 			<div class="logo">🌿 Taniva</div>
 			<div class="nav-links">
-				<button class="btn-login" onclick={() => goto('/login')}>Masuk / Daftar</button>
+				{#if data.user}
+					<button class="btn-login" onclick={() => goto(data.user.role === 'ADMIN' ? '/admin' : data.user.role === 'UMKM' ? '/umkm' : '/petani')}>Dashboard</button>
+				{:else}
+					<button class="btn-login" onclick={() => goto('/login')}>Masuk / Daftar</button>
+				{/if}
 			</div>
 		</div>
 	</nav>
@@ -31,10 +36,17 @@
 				</p>
 				
 				<div class="hero-actions animate-fade-in-up" style="animation-delay: 300ms;">
-					<button class="btn-primary" onclick={() => goto('/login')}>
-						Mulai Sekarang
-						<span class="arrow">→</span>
-					</button>
+					{#if data.user}
+						<button class="btn-primary" onclick={() => goto(data.user.role === 'ADMIN' ? '/admin' : data.user.role === 'UMKM' ? '/umkm' : '/petani')}>
+							Dashboard
+							<span class="arrow">→</span>
+						</button>
+					{:else}
+						<button class="btn-primary" onclick={() => goto('/login')}>
+							Mulai Sekarang
+							<span class="arrow">→</span>
+						</button>
+					{/if}
 					<a href="#features" class="btn-secondary">Pelajari Lebih Lanjut</a>
 				</div>
 			</div>

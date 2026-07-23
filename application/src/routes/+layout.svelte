@@ -5,8 +5,8 @@
 	
 	let { children, data } = $props();
 	
-	// Show nav only if not on the root landing page
-	let showNav = $derived($page.url.pathname !== '/');
+	// Show nav only if not on the root landing page or login page
+	let showNav = $derived($page.url.pathname !== '/' && $page.url.pathname !== '/login');
 </script>
 
 <svelte:head>
@@ -28,9 +28,11 @@
 						<span class="role-badge">
 							{data.user.role === 'FARMER' ? '🧑‍🌾 Petani' : data.user.role === 'UMKM' ? '🍽️ UMKM' : '🛡️ Admin'}
 						</span>
-						<a href="/logout" data-sveltekit-reload class="btn-logout" aria-label="Logout">
-							Logout
-						</a>
+						<form action="/login?/logout" method="POST" style="margin:0; display:inline-flex;">
+							<button type="submit" class="btn-logout" aria-label="Logout">
+								Logout
+							</button>
+						</form>
 					{/if}
 				</div>
 			</div>

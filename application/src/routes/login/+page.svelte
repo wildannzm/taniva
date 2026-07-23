@@ -8,6 +8,7 @@
 	let name = $state(String(form?.name || ''));
 	let email = $state(String(form?.email || ''));
 	let password = $state('');
+	let role = $state('petani');
 	let isAuthenticating = $state(false);
 
 	onMount(() => {
@@ -20,6 +21,7 @@
 		name = '';
 		email = '';
 		password = '';
+		role = 'petani';
 	}
 </script>
 
@@ -86,9 +88,33 @@
 				</div>
 
 
+				{#if authMode === 'register'}
+					<div class="role-selector">
+						<p class="role-label">Pilih Peran Anda</p>
+						<div class="role-grid">
+							<label class="role-card {role === 'petani' ? 'selected' : ''}">
+								<input type="radio" name="role" value="petani" bind:group={role} required>
+								<div class="role-icon">🧑‍🌾</div>
+								<div class="role-text">
+									<span class="role-title">Petani</span>
+									<span class="role-desc">Saya ingin menjual panen.</span>
+								</div>
+								<div class="check-circle"></div>
+							</label>
+							<label class="role-card {role === 'umkm' ? 'selected' : ''}">
+								<input type="radio" name="role" value="umkm" bind:group={role} required>
+								<div class="role-icon">🍽️</div>
+								<div class="role-text">
+									<span class="role-title">UMKM</span>
+									<span class="role-desc">Saya butuh bahan baku.</span>
+								</div>
+								<div class="check-circle"></div>
+							</label>
+						</div>
+					</div>
+				{/if}
 
-
-				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || email.trim().length < 5 || password.length < 3}>
+				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating}>
 					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
 					{#if isAuthenticating}
 						<div class="spinner"></div>

@@ -3,6 +3,15 @@ import { prisma } from '$lib/server/db/prisma.js';
 import bcrypt from 'bcryptjs';
 import { signToken } from '$lib/server/jwt.js';
 
+/** @type {import('./$types').PageServerLoad} */
+export const load = async ({ locals }) => {
+	if (locals.user) {
+		const redirectUrl = locals.user.role === 'FARMER' ? '/petani' : (locals.user.role === 'UMKM' ? '/umkm' : (locals.user.role === 'ADMIN' ? '/admin' : '/'));
+		throw redirect(303, redirectUrl);
+	}
+	return {};
+};
+
 /** @type {import('./$types').Actions} */
 export const actions = {
 	login: async ({ request, cookies }) => {
@@ -45,7 +54,7 @@ export const actions = {
 		});
 
 		// Redirect based on role
-		const redirectUrl = user.role === 'FARMER' ? '/petani' : (user.role === 'UMKM' ? '/umkm' : '/');
+		const redirectUrl = user.role === 'FARMER' ? '/petani' : (user.role === 'UMKM' ? '/umkm' : (user.role === 'ADMIN' ? '/admin' : '/'));
 		throw redirect(303, redirectUrl);
 	},
 
