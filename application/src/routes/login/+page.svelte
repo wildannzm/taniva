@@ -28,9 +28,11 @@
 <div class="split-layout">
 	<!-- Left Side: Visual/Brand -->
 	<div class="brand-panel">
-		<div class="mesh-bg"></div>
 		<div class="brand-content animate-slide-up-slow">
-			<div class="logo-badge">🌿 Taniva</div>
+			<div class="logo-badge">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 4L4 20h16L12 4z"/></svg>
+				Taniva
+			</div>
 			<h1 class="brand-title">Agri-Tech<br/>Trust Layer<br/>Solo Raya</h1>
 			<p class="brand-subtitle">Ekosistem terpadu untuk memastikan kualitas panen dan membangun kepercayaan antara Petani dan UMKM.</p>
 		</div>
@@ -38,19 +40,15 @@
 
 	<!-- Right Side: Auth Form -->
 	<div class="auth-panel">
-		<div class="auth-container animate-fade-in-up">
-			
-			<div class="tabs-container">
-				<div class="tabs-bg">
-					<button class="tab-btn {authMode === 'login' ? 'active' : ''}" onclick={() => toggleMode('login')}>Masuk</button>
-					<button class="tab-btn {authMode === 'register' ? 'active' : ''}" onclick={() => toggleMode('register')}>Daftar</button>
-					<div class="tab-indicator {authMode}"></div>
-				</div>
-			</div>
-
+		<div class="auth-card animate-fade-in-up">
 			<div class="auth-header">
 				<h2>{authMode === 'login' ? 'Selamat Datang Kembali' : 'Mulai Perjalanan Anda'}</h2>
-				<p>{authMode === 'login' ? 'Masuk ke ekosistem Taniva.' : 'Buat akun Taniva dalam hitungan detik.'}</p>
+				<p>{authMode === 'login' ? 'Masuk ke sistem kepercayaan terpadu Taniva.' : 'Buat akun Taniva dalam hitungan detik.'}</p>
+			</div>
+
+			<div class="tabs-container">
+				<button class="tab-btn {authMode === 'login' ? 'active' : ''}" onclick={() => toggleMode('login')}>Masuk</button>
+				<button class="tab-btn {authMode === 'register' ? 'active' : ''}" onclick={() => toggleMode('register')}>Daftar</button>
 			</div>
 
 			<form class="auth-form" method="POST" action="?/{authMode}" use:enhance={() => {
@@ -68,25 +66,21 @@
 				{/if}
 
 				{#if authMode === 'register'}
-					<div class="input-container animate-expand">
-						<input type="text" id="name" name="name" bind:value={name} required={authMode === 'register'} placeholder=" " />
+					<div class="input-group animate-expand">
 						<label for="name">Nama Lengkap</label>
-						<div class="input-line"></div>
+						<input type="text" id="name" name="name" bind:value={name} required={authMode === 'register'} />
 					</div>
 				{/if}
 
-				<div class="input-container">
-					<input type="email" id="email" name="email" bind:value={email} required placeholder=" " />
+				<div class="input-group">
 					<label for="email">Email</label>
-					<div class="input-line"></div>
+					<input type="email" id="email" name="email" bind:value={email} required />
 				</div>
 
-				<div class="input-container">
-					<input type="password" id="password" name="password" bind:value={password} required placeholder=" " />
+				<div class="input-group">
 					<label for="password">Kata Sandi</label>
-					<div class="input-line"></div>
+					<input type="password" id="password" name="password" bind:value={password} required />
 				</div>
-
 
 				{#if authMode === 'register'}
 					<div class="role-selector">
@@ -94,21 +88,15 @@
 						<div class="role-grid">
 							<label class="role-card {role === 'petani' ? 'selected' : ''}">
 								<input type="radio" name="role" value="petani" bind:group={role} required>
-								<div class="role-icon">🧑‍🌾</div>
 								<div class="role-text">
 									<span class="role-title">Petani</span>
-									<span class="role-desc">Saya ingin menjual panen.</span>
 								</div>
-								<div class="check-circle"></div>
 							</label>
 							<label class="role-card {role === 'umkm' ? 'selected' : ''}">
 								<input type="radio" name="role" value="umkm" bind:group={role} required>
-								<div class="role-icon">🍽️</div>
 								<div class="role-text">
 									<span class="role-title">UMKM</span>
-									<span class="role-desc">Saya butuh bahan baku.</span>
 								</div>
-								<div class="check-circle"></div>
 							</label>
 						</div>
 					</div>
@@ -129,22 +117,23 @@
 	:global(body) {
 		margin: 0;
 		font-family: var(--font-sans, system-ui, sans-serif);
+		background: var(--color-snow);
 	}
 
 	.split-layout {
 		display: flex;
 		min-height: 100dvh;
-		background: #ffffff;
+		background: var(--color-snow);
 		overflow: hidden;
 	}
 
 	/* Left Panel */
 	.brand-panel {
 		display: none;
-		flex: 1.2;
+		flex: 1;
 		position: relative;
 		overflow: hidden;
-		background: #0a2e11;
+		background: linear-gradient(135deg, #0a1f11 0%, #1b5e20 100%);
 		color: white;
 		padding: 4rem;
 	}
@@ -155,23 +144,6 @@
 			flex-direction: column;
 			justify-content: center;
 		}
-	}
-
-	.mesh-bg {
-		position: absolute;
-		inset: -50%;
-		background: 
-			radial-gradient(circle at 20% 30%, rgba(27, 94, 32, 0.8) 0%, transparent 50%),
-			radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.6) 0%, transparent 50%),
-			radial-gradient(circle at 50% 10%, rgba(139, 195, 74, 0.4) 0%, transparent 50%);
-		filter: blur(80px);
-		animation: pulseBg 15s ease-in-out infinite alternate;
-		z-index: 0;
-	}
-
-	@keyframes pulseBg {
-		0% { transform: scale(1) translate(0, 0); }
-		100% { transform: scale(1.1) translate(-5%, 5%); }
 	}
 
 	.brand-content {
@@ -215,192 +187,142 @@
 
 	/* Right Panel */
 	.auth-panel {
-		flex: 1;
+		flex: 1.2;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		padding: 2rem;
-		background: #ffffff;
+		background: var(--color-snow);
 		position: relative;
 	}
 
-	.auth-container {
+	.auth-card {
+		background: var(--color-paper);
+		border-radius: 24px;
+		box-shadow: var(--shadow-elevated);
 		width: 100%;
-		max-width: 420px;
+		max-width: 440px;
+		padding: 48px;
+		position: relative;
+	}
+
+	.auth-header {
+		text-align: center;
+		margin-bottom: 32px;
+	}
+
+	.auth-header h2 {
+		font-size: 24px;
+		font-weight: 600;
+		color: var(--color-ink);
+		margin: 0 0 8px;
+		letter-spacing: -0.03em;
+	}
+
+	.auth-header p {
+		font-size: 14px;
+		color: var(--color-smoke);
+		margin: 0;
+		font-weight: 500;
 	}
 
 	.tabs-container {
 		display: flex;
-		justify-content: center;
-		margin-bottom: 3rem;
-	}
-
-	.tabs-bg {
-		display: flex;
-		background: #f4f4f0;
+		background: var(--color-snow);
 		border-radius: 100px;
 		padding: 4px;
-		position: relative;
-		width: 100%;
-		max-width: 280px;
+		margin-bottom: 32px;
+		border: 1px solid var(--color-mist);
 	}
 
 	.tab-btn {
 		flex: 1;
-		padding: 0.75rem 1.5rem;
+		padding: 8px 16px;
 		border: none;
 		background: transparent;
 		font-weight: 600;
-		font-size: 0.9375rem;
-		color: #71716e;
+		font-size: 14px;
+		color: var(--color-smoke);
+		border-radius: 100px;
 		cursor: pointer;
-		position: relative;
-		z-index: 2;
-		transition: color 0.3s;
+		transition: all 0.2s;
 	}
 
 	.tab-btn.active {
-		color: #1b5e20;
-	}
-
-	.tab-indicator {
-		position: absolute;
-		top: 4px;
-		bottom: 4px;
-		width: calc(50% - 4px);
-		background: #ffffff;
-		border-radius: 100px;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-		z-index: 1;
-		transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.26, 1.55);
-	}
-
-	.tab-indicator.login {
-		transform: translateX(0);
-	}
-
-	.tab-indicator.register {
-		transform: translateX(100%);
-	}
-
-	.auth-header {
-		margin-bottom: 2.5rem;
-		text-align: center;
-	}
-
-	.auth-header h2 {
-		font-size: 1.875rem;
-		font-weight: 800;
-		color: #1c1c1a;
-		margin: 0 0 0.5rem;
-		letter-spacing: -0.02em;
-	}
-
-	.auth-header p {
-		font-size: 0.9375rem;
-		color: #71716e;
-		margin: 0;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		box-shadow: var(--shadow-subtle);
 	}
 
 	.auth-form {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 20px;
 	}
 
-	.input-container {
-		position: relative;
-		margin-bottom: 0.5rem;
+	.input-group {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 
-	.input-container input {
+	.input-group label {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--color-ink);
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+
+	.input-group input {
 		width: 100%;
-		padding: 1.25rem 1rem 0.5rem;
-		border: none;
-		background: #f8f9fa;
-		border-radius: 12px 12px 0 0;
-		font-size: 1rem;
-		color: #1c1c1a;
-		transition: background 0.3s;
+		padding: 12px 16px;
+		background: var(--color-snow);
+		border: 1px solid var(--color-mist);
+		border-radius: 12px;
+		font-size: 14px;
+		color: var(--color-ink);
+		transition: all 0.2s;
 		box-sizing: border-box;
 	}
 
-	.input-container input:focus {
+	.input-group input:focus {
 		outline: none;
-		background: #e8f5e9;
-	}
-
-	.input-container label {
-		position: absolute;
-		left: 1rem;
-		top: 50%;
-		transform: translateY(-50%);
-		font-size: 1rem;
-		color: #71716e;
-		pointer-events: none;
-		transition: all 0.2s ease;
-	}
-
-	.input-container input:focus + label,
-	.input-container input:not(:placeholder-shown) + label {
-		top: 0.5rem;
-		transform: translateY(0);
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #1b5e20;
-	}
-
-	.input-line {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 2px;
-		background: #dadad6;
-		transition: all 0.3s;
-	}
-
-	.input-container input:focus ~ .input-line {
-		background: #1b5e20;
-		height: 3px;
+		border-color: #1b5e20;
+		background: var(--color-paper);
+		box-shadow: 0 0 0 4px rgba(27, 94, 32, 0.1);
 	}
 
 	.role-selector {
-		margin-top: 0.5rem;
+		margin-top: 8px;
 	}
 
 	.role-label {
-		font-size: 0.875rem;
+		font-size: 12px;
 		font-weight: 600;
-		color: #1c1c1a;
-		margin: 0 0 1rem;
+		color: var(--color-ink);
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		margin: 0 0 8px;
 	}
 
 	.role-grid {
 		display: grid;
-		grid-template-columns: 1fr;
-		gap: 0.75rem;
-	}
-
-	@media (min-width: 480px) {
-		.role-grid {
-			grid-template-columns: repeat(3, 1fr);
-			gap: 1rem;
-		}
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
 	}
 
 	.role-card {
-		position: relative;
 		display: flex;
-		align-items: flex-start;
-		gap: 1rem;
-		padding: 1rem;
-		border-radius: 16px;
-		border: 2px solid #f4f4f0;
-		background: #ffffff;
+		align-items: center;
+		justify-content: center;
+		padding: 12px;
+		border-radius: 12px;
+		border: 1px solid var(--color-mist);
+		background: var(--color-snow);
 		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: all 0.2s;
 	}
 
 	.role-card input {
@@ -408,131 +330,48 @@
 	}
 
 	.role-card:hover {
-		border-color: #a5d6a7;
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.08);
+		border-color: #1b5e20;
 	}
 
 	.role-card.selected {
 		border-color: #1b5e20;
-		background: #f2fcf3;
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.12);
-	}
-
-	.role-icon {
-		font-size: 1.75rem;
-		background: #f4f4f0;
-		width: 48px;
-		height: 48px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 12px;
-		transition: background 0.3s;
-		flex-shrink: 0;
-	}
-
-	.role-card.selected .role-icon {
-		background: #ffffff;
-	}
-
-	.role-text {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
-	.role-title {
-		font-weight: 700;
-		color: #1c1c1a;
-		font-size: 1rem;
-	}
-
-	.role-desc {
-		font-size: 0.75rem;
-		color: #71716e;
-	}
-
-	.role-card.selected .role-title {
+		background: #e8f5e9;
 		color: #1b5e20;
 	}
 
-	.check-circle {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-		border: 2px solid #dadad6;
-		transition: all 0.3s;
-		box-sizing: border-box;
-	}
-
-	.role-card.selected .check-circle {
-		border-color: #1b5e20;
-		background: #1b5e20;
-	}
-
-	.role-card.selected .check-circle::after {
-		content: '';
-		position: absolute;
-		left: 5px;
-		top: 2px;
-		width: 4px;
-		height: 8px;
-		border: solid white;
-		border-width: 0 2px 2px 0;
-		transform: rotate(45deg);
+	.role-title {
+		font-weight: 600;
+		font-size: 14px;
 	}
 
 	.submit-btn {
 		position: relative;
-		margin-top: 1.5rem;
-		padding: 1.25rem;
-		background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-		color: #ffffff;
+		margin-top: 12px;
+		padding: 14px;
+		background: #1b5e20;
+		color: var(--color-paper);
 		border: none;
 		border-radius: 100px;
-		font-size: 1.0625rem;
-		font-weight: 700;
+		font-size: 16px;
+		font-weight: 600;
 		cursor: pointer;
-		overflow: hidden;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		box-shadow: 0 8px 24px rgba(27, 94, 32, 0.25);
-	}
-
-	.submit-btn::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-		opacity: 0;
-		transition: opacity 0.3s;
-		z-index: 0;
+		transition: all 0.2s;
+		box-shadow: 0 4px 12px rgba(27, 94, 32, 0.2);
 	}
 
 	.submit-btn:hover:not(:disabled) {
-		transform: translateY(-2px);
-		box-shadow: 0 12px 32px rgba(27, 94, 32, 0.35);
-	}
-
-	.submit-btn:hover:not(:disabled)::before {
-		opacity: 1;
+		background: #144517;
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba(27, 94, 32, 0.3);
 	}
 
 	.submit-btn:active:not(:disabled) {
-		transform: translateY(1px);
+		transform: translateY(0);
 	}
 
 	.submit-btn:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
-		transform: none;
-		box-shadow: none;
 	}
 
 	.btn-text {
@@ -549,13 +388,12 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 1.5rem;
-		height: 1.5rem;
-		border: 3px solid rgba(255, 255, 255, 0.3);
+		width: 20px;
+		height: 20px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-radius: 50%;
 		border-top-color: #ffffff;
 		animation: spin 0.8s linear infinite;
-		z-index: 2;
 	}
 
 	@keyframes spin {
@@ -565,18 +403,13 @@
 	.error-toast {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 8px;
 		background: #ffebee;
 		color: #d32f2f;
-		padding: 1rem;
+		padding: 12px;
 		border-radius: 12px;
-		font-size: 0.875rem;
+		font-size: 14px;
 		font-weight: 500;
-		border-left: 4px solid #d32f2f;
-	}
-
-	.error-icon {
-		font-size: 1.25rem;
 	}
 
 	/* Animations */
@@ -589,7 +422,7 @@
 	}
 
 	.animate-expand {
-		animation: expandY 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: expandY 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 		overflow: hidden;
 	}
 
@@ -598,7 +431,7 @@
 	}
 
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(30px); }
+		from { opacity: 0; transform: translateY(20px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
