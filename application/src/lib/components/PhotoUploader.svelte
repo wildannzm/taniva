@@ -1,4 +1,6 @@
 <script>
+	import { onDestroy } from 'svelte';
+	
 	let { onFileSelect } = $props();
 	
 	let isDragging = $state(false);
@@ -49,18 +51,30 @@
 	 */
 	function processFile(file) {
 		if (file.type.startsWith('image/')) {
+			cleanupPreview();
 			previewUrl = URL.createObjectURL(file);
 			onFileSelect(file);
 		} else {
 			alert('Mohon unggah file gambar (.jpg, .png)');
 		}
 	}
+	
+	function cleanupPreview() {
+		if (previewUrl) {
+			URL.revokeObjectURL(previewUrl);
+			previewUrl = null;
+		}
+	}
 
 	function resetFile() {
-		previewUrl = null;
+		cleanupPreview();
 		if (fileInput) fileInput.value = '';
 		onFileSelect(null);
 	}
+	
+	onDestroy(() => {
+		cleanupPreview();
+	});
 </script>
 
 <div class="uploader-wrapper">

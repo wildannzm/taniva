@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { userRole, transactionState } from '$lib/stores/app.js';
-	import { searchMatching, getRouteEstimate } from '$lib/api/client.js';
+	import { searchMatching } from '$lib/api/matching.api.js';
+	import { getRouteEstimate } from '$lib/api/logistics.api.js';
 	
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
@@ -40,11 +41,11 @@
 		error = null;
 		
 		try {
-			const res = await searchMatching({
+			const { data } = await searchMatching({
 				...(intent || {}),
 				umkm_lokasi: UMKM_LOC
 			});
-			matches = res.results || [];
+			matches = data.results || [];
 			transactionState.update(s => ({ ...s, matchingResults: matches }));
 			currentStep = 'results';
 		} catch (/** @type {any} */ err) {
@@ -60,8 +61,8 @@
 		error = null;
 		
 		try {
-			const res = await getRouteEstimate(match.farmer_id, UMKM_LOC);
-			routeData = res;
+			const { data } = await getRouteEstimate(match.farmer_id, UMKM_LOC);
+			routeData = data;
 		} catch (/** @type {any} */ err) {
 			error = err.message;
 			currentStep = 'results';

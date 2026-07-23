@@ -178,13 +178,13 @@ export async function POST({ request, url }) {
 					originalImageUrl,
 					annotatedImageUrl: yoloResult.annotatedImageUrl,
 					qualityScore: yoloResult.qualityScore,
-					qualityLabel: yoloResult.qualityLabel,
+					qualityLabel: yoloResult.qualityLabel.toUpperCase(),
 					freshCount: yoloResult.freshCount,
 					rottenCount: yoloResult.rottenCount,
 					totalDetected: yoloResult.totalDetected,
 					aiSource: yoloResult.source,
 					aiResultJson: JSON.stringify(yoloResult), // Snapshot of AI result
-					status: 'available'
+					status: 'AVAILABLE'
 				}
 			});
 
@@ -269,6 +269,30 @@ export async function POST({ request, url }) {
 				},
 				{ status: 404 }
 			);
+		}
+
+		if (err.code === 'NO_TOMATO_DETECTED') {
+			return json({
+				success: false,
+				error: {
+					code: 'NO_TOMATO_DETECTED',
+					message: 'Tidak ada tomat yang terdeteksi pada gambar. Pastikan gambar jelas.',
+					details: []
+				},
+				requestId: crypto.randomUUID()
+			}, { status: 400 });
+		}
+
+		if (err.code === 'AI_SERVICE_ERROR' || err.code === 'EXTERNAL_TIMEOUT') {
+			return json({
+				success: false,
+				error: {
+					code: err.code,
+					message: 'Layanan AI sedang gangguan atau kehabisan waktu.',
+					details: []
+				},
+				requestId: crypto.randomUUID()
+			}, { status: 502 });
 		}
 
 		return json(

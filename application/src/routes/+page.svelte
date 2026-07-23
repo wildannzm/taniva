@@ -10,7 +10,7 @@
 			<div class="logo">🌿 Taniva</div>
 			<div class="nav-links">
 				{#if data.user}
-					<button class="btn-login" onclick={() => goto(data.user.role === 'ADMIN' ? '/admin' : data.user.role === 'UMKM' ? '/umkm' : '/petani')}>Dashboard</button>
+					<button class="btn-login" onclick={() => goto(data.user?.role === 'ADMIN' ? '/admin' : data.user?.role === 'UMKM' ? '/umkm' : '/petani')}>Dashboard</button>
 				{:else}
 					<button class="btn-login" onclick={() => goto('/login')}>Masuk / Daftar</button>
 				{/if}
@@ -37,7 +37,7 @@
 				
 				<div class="hero-actions animate-fade-in-up" style="animation-delay: 300ms;">
 					{#if data.user}
-						<button class="btn-primary" onclick={() => goto(data.user.role === 'ADMIN' ? '/admin' : data.user.role === 'UMKM' ? '/umkm' : '/petani')}>
+						<button class="btn-primary" onclick={() => goto(data.user?.role === 'ADMIN' ? '/admin' : data.user?.role === 'UMKM' ? '/umkm' : '/petani')}>
 							Dashboard
 							<span class="arrow">→</span>
 						</button>

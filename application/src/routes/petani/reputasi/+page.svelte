@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { userRole } from '$lib/stores/app.js';
-	import { getFarmerReputation } from '$lib/api/client.js';
+	import { getFarmerReputation } from '$lib/api/farmer.api.js';
 	
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
@@ -16,8 +16,8 @@
 	
 	async function fetchReputation() {
 		try {
-			const res = await getFarmerReputation(FARMER_ID);
-			score = res.skor_reputasi;
+			const { data } = await getFarmerReputation(FARMER_ID);
+			score = data.skor_reputasi;
 			currentStep = 'done';
 		} catch (/** @type {any} */ err) {
 			error = err.message;

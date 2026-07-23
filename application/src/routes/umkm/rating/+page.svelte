@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { userRole } from '$lib/stores/app.js';
-	import { submitRating } from '$lib/api/client.js';
+	import { submitRating } from '$lib/api/feedback.api.js';
 	
 	import RatingForm from '$lib/components/RatingForm.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
@@ -26,8 +26,8 @@
 		error = null;
 		
 		try {
-			const res = await submitRating(ORDER_ID, ratingVal, reviewText);
-			newReputation = res.skor_reputasi_baru;
+			const { data } = await submitRating(ORDER_ID, ratingVal, reviewText);
+			newReputation = data.skor_reputasi_baru;
 			currentStep = 'success';
 		} catch (/** @type {any} */ err) {
 			error = err.message;

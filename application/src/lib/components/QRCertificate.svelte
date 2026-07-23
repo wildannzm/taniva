@@ -1,5 +1,5 @@
 <script>
-	let { batchId, hash, timestamp, score } = $props();
+	let { batchId, hash, timestamp, score, verifyUrl = '' } = $props();
 </script>
 
 <div class="cert-card card animate-scale-in">
