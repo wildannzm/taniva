@@ -22,12 +22,16 @@ export async function extractIntent(text) {
 
 		let parsedJson;
 		try {
-			// Basic cleanup just in case there are code fences, though structured output shouldn't have them
-			const cleanedContent = rawContent
-				.replace(/^```json\s*/, '')
-				.replace(/\s*```$/, '')
-				.trim();
-			parsedJson = JSON.parse(cleanedContent);
+			// Extract JSON from potential markdown fences or extra conversational text
+			const start = rawContent.indexOf('{');
+			const end = rawContent.lastIndexOf('}');
+			
+			if (start !== -1 && end !== -1 && end >= start) {
+				const jsonStr = rawContent.slice(start, end + 1);
+				parsedJson = JSON.parse(jsonStr);
+			} else {
+				parsedJson = JSON.parse(rawContent);
+			}
 		} catch {
 			throw new OpenRouterError(
 				'Failed to parse OpenRouter response as JSON',

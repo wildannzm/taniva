@@ -11,32 +11,37 @@
 	<div class="params-grid">
 		<div class="param-item">
 			<span class="param-label">Komoditas</span>
-			<span class="param-value capitalize">{intent.komoditas || '-'}</span>
+			<span class="param-value capitalize">{intent.commodity === 'tomato' ? 'Tomat' : (intent.commodity || '-')}</span>
 		</div>
 		<div class="param-item">
 			<span class="param-label">Kuantitas</span>
-			<span class="param-value">{intent.kuantitas || 0} {intent.satuan || ''}</span>
+			<span class="param-value">{intent.quantityKg || 0} kg</span>
 		</div>
 		<div class="param-item">
 			<span class="param-label">Kualitas Min.</span>
 			<div style="display: flex; gap: 0.25rem; align-items: center;">
-				<span class="param-value">{intent.kualitas_minimum || 0}/100</span>
-				{#if intent.kualitas_minimum >= 80}
+				<span class="param-value">{intent.minimumQuality || 0}/100</span>
+				{#if intent.minimumQuality >= 80}
 					<span class="grade grade-a" style="font-size: 0.625rem; padding: 0.125rem 0.375rem;">A</span>
-				{:else if intent.kualitas_minimum >= 60}
+				{:else if intent.minimumQuality >= 60}
 					<span class="grade grade-b" style="font-size: 0.625rem; padding: 0.125rem 0.375rem;">B</span>
 				{/if}
 			</div>
 		</div>
 		<div class="param-item">
 			<span class="param-label">Tenggat Waktu</span>
-			<span class="param-value">{new Date(intent.tenggat).toLocaleDateString('id-ID')}</span>
+			<span class="param-value">{intent.neededDate ? new Date(intent.neededDate).toLocaleDateString('id-ID') : '-'}</span>
 		</div>
 	</div>
 	
 	<div class="confirm-actions">
 		<button class="btn btn-ghost" onclick={onCancel}>Ubah Pesan</button>
-		<button class="btn btn-primary" onclick={onConfirm}>Cari Petani</button>
+		<button 
+			class="btn btn-primary" 
+			onclick={onConfirm}
+			disabled={!intent || !intent.commodity || !intent.quantityKg || !intent.minimumQuality || !intent.neededDate}
+			title={(!intent || !intent.commodity || !intent.quantityKg || !intent.minimumQuality || !intent.neededDate) ? 'Mohon lengkapi detail pesanan (Komoditas, Kuantitas, Kualitas, Tenggat)' : ''}
+		>Cari Petani</button>
 	</div>
 </div>
 

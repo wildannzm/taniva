@@ -7,12 +7,16 @@
 		<div class="farmer-info">
 			<div class="farmer-avatar">🧑‍🌾</div>
 			<div>
-				<h3 class="farmer-name">{match.farmer_nama}</h3>
-				<span class="badge-verified" style="font-size: 0.625rem; padding: 0.125rem 0.5rem;">Terverifikasi</span>
+				<h3 class="farmer-name">{match.allocations.map((/** @type {any} */ a) => a.farmer.name).join(' & ')}</h3>
+				{#if match.type === 'split'}
+					<span class="badge-verified" style="font-size: 0.625rem; padding: 0.125rem 0.5rem; background: #e3f2fd; color: #1976d2;">Split Order</span>
+				{:else}
+					<span class="badge-verified" style="font-size: 0.625rem; padding: 0.125rem 0.5rem;">Terverifikasi</span>
+				{/if}
 			</div>
 		</div>
 		<div class="total-score">
-			<span class="score-val">{match.skor_total.toFixed(1)}</span>
+			<span class="score-val">{(match.score?.total || 0).toFixed(1)}</span>
 			<span class="score-label">Skor Total</span>
 		</div>
 	</div>
@@ -26,10 +30,10 @@
 		<div class="score-row">
 			<div class="score-meta">
 				<span class="score-name">Kualitas (40%)</span>
-				<span class="score-num">{match.breakdown.skor_kualitas}</span>
+				<span class="score-num">{(match.score?.aggregateQuality || 0).toFixed(0)}</span>
 			</div>
 			<div class="score-bar-track">
-				<div class="score-bar-fill score-bar-fill-quality" style="width: {match.breakdown.skor_kualitas}%;"></div>
+				<div class="score-bar-fill score-bar-fill-quality" style="width: {match.score?.aggregateQuality || 0}%;"></div>
 			</div>
 		</div>
 		
@@ -37,10 +41,10 @@
 		<div class="score-row">
 			<div class="score-meta">
 				<span class="score-name">Reputasi (35%)</span>
-				<span class="score-num">{match.breakdown.skor_reputasi}</span>
+				<span class="score-num">{(match.score?.aggregateReputation || 0).toFixed(0)}</span>
 			</div>
 			<div class="score-bar-track">
-				<div class="score-bar-fill score-bar-fill-reputation" style="width: {match.breakdown.skor_reputasi}%;"></div>
+				<div class="score-bar-fill score-bar-fill-reputation" style="width: {match.score?.aggregateReputation || 0}%;"></div>
 			</div>
 		</div>
 		
@@ -48,10 +52,24 @@
 		<div class="score-row">
 			<div class="score-meta">
 				<span class="score-name">Logistik (25%)</span>
-				<span class="score-num">{match.breakdown.skor_logistik}</span>
+				<span class="score-num">{(match.score?.aggregateLogistics || 0).toFixed(0)}</span>
 			</div>
 			<div class="score-bar-track">
-				<div class="score-bar-fill score-bar-fill-logistics" style="width: {match.breakdown.skor_logistik}%;"></div>
+				<div class="score-bar-fill score-bar-fill-logistics" style="width: {match.score?.aggregateLogistics || 0}%;"></div>
+			</div>
+		</div>
+
+		<!-- Jarak dan Biaya -->
+		<div class="additional-info" style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.8125rem; background: var(--color-surface); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--color-outline-variant);">
+			<div style="display: flex; flex-direction: column;">
+				<span style="color: var(--color-on-surface-variant); font-size: 0.6875rem;">Total Jarak</span>
+				<span style="font-weight: 600; color: var(--color-on-surface);">
+					{(match.allocations?.reduce((/** @type {any} */ acc, /** @type {any} */ a) => acc + (a.logistics?.distanceKm || 0), 0) || 0).toFixed(1)} km
+				</span>
+			</div>
+			<div style="display: flex; flex-direction: column; text-align: right;">
+				<span style="color: var(--color-on-surface-variant); font-size: 0.6875rem;">Estimasi Biaya</span>
+				<strong>Rp {(match.grandTotal || 0).toLocaleString('id-ID')}</strong>
 			</div>
 		</div>
 	</div>

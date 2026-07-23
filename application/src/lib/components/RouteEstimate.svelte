@@ -26,39 +26,47 @@
 		// UMKM Location (Solo Raya)
 		/** @type {[number, number]} */
 		const umkmLoc = [-7.5666, 110.8283];
-		// Mock Farmer Location (Solo Raya Outskirts)
-		/** @type {[number, number]} */
-		const farmerLoc = [-7.6050, 110.8550];
+		
+		// Get farmer locations from the match data
+		const farmerLocs = estimate.farmerLocs || [{lat: -7.6050, lng: 110.8550}];
 
 		// Define custom eye-catching icons
 		const umkmIcon = L.divIcon({ html: '<div class="emoji-marker dest bounce">🍽️</div>', className: '', iconSize: [40, 40] });
 		const farmerIcon = L.divIcon({ html: '<div class="emoji-marker src">🧑‍🌾</div>', className: '', iconSize: [40, 40] });
 
 		L.marker(umkmLoc, { icon: umkmIcon }).addTo(map);
-		L.marker(farmerLoc, { icon: farmerIcon }).addTo(map);
+		
+		const bounds = L.latLngBounds([umkmLoc]);
 
-		// Fetch real route from OSRM to follow the actual roads
-		try {
-			const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${farmerLoc[1]},${farmerLoc[0]};${umkmLoc[1]},${umkmLoc[0]}?overview=full&geometries=geojson`);
-			const data = await res.json();
-			
-			if (data.code === 'Ok' && data.routes.length > 0) {
-				const coords = data.routes[0].geometry.coordinates.map((/** @type {number[]} */ c) => [c[1], c[0]]);
+		for (const loc of farmerLocs) {
+			const fLoc = [loc.lat, loc.lng];
+			L.marker(fLoc, { icon: farmerIcon }).addTo(map);
+			bounds.extend(fLoc);
+
+			// Fetch real route from OSRM for each farmer
+			try {
+				const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${fLoc[1]},${fLoc[0]};${umkmLoc[1]},${umkmLoc[0]}?overview=full&geometries=geojson`);
+				const data = await res.json();
 				
-				// Add glowing background line
-				L.polyline(coords, { color: '#4caf50', weight: 8, opacity: 0.3 }).addTo(map);
-				// Add main route line
-				const polyline = L.polyline(coords, { color: '#1b5e20', weight: 4, opacity: 1 }).addTo(map);
-				
-				map.fitBounds(polyline.getBounds(), { padding: [40, 40], animate: true, duration: 1 });
-			} else {
-				throw new Error('OSRM Failed');
+				if (data.code === 'Ok' && data.routes.length > 0) {
+					const routeGeoJSON = data.routes[0].geometry;
+					// Draw the route line with a nice style
+					L.geoJSON(routeGeoJSON, {
+						style: {
+							color: '#2e7d32',
+							weight: 5,
+							opacity: 0.7,
+							dashArray: '10, 10'
+						}
+					}).addTo(map);
+				}
+			} catch (e) {
+				console.error("OSRM route fetch failed", e);
 			}
-		} catch (e) {
-			// Fallback to straight dashed line if OSRM is unreachable
-			const polyline = L.polyline([farmerLoc, umkmLoc], { color: '#1b5e20', weight: 4, dashArray: '8, 8' }).addTo(map);
-			map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
 		}
+
+		// Fit bounds to show all markers
+		map.fitBounds(bounds, { padding: [50, 50] });
 	});
 
 	onDestroy(() => {

@@ -23,6 +23,7 @@ export const intentSchema = z
 						{ message: 'Invalid date' }
 					)
 			})
+			.nullable()
 			.optional(),
 		partialIntent: z
 			.object({
@@ -35,6 +36,7 @@ export const intentSchema = z
 					.nullable()
 					.optional()
 			})
+			.nullable()
 			.optional(),
 		missingFields: z.array(z.string()),
 		clarificationQuestion: z.string().nullable()

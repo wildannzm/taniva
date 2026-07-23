@@ -2,11 +2,14 @@
 	import { goto } from '$app/navigation';
 	import { userRole, transactionState } from '$lib/stores/app.js';
 	import { extractIntent } from '$lib/api/nlp.api.js';
+	import { createOrder } from '$lib/api/orders.api.js';
 	
 	import NaturalLanguageInput from '$lib/components/NaturalLanguageInput.svelte';
 	import ExtractedIntentConfirm from '$lib/components/ExtractedIntentConfirm.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
+
+	let { data } = $props();
 
 	userRole.set('umkm');
 	
@@ -22,16 +25,52 @@
 		try {
 			const { data } = await extractIntent(text);
 			intentData = data;
-			currentStep = 'confirm';
+			transactionState.update(s => ({ ...s, nlpIntent: intentData }));
+			
+			if (data.status === 'complete') {
+				// Langsung bypass ke matching!
+				currentStep = 'confirm'; // Set step sebentar untuk state
+				await handleConfirm();
+			} else {
+				// Butuh klarifikasi (ada yang kurang)
+				currentStep = 'confirm';
+			}
 		} catch (/** @type {any} */ err) {
 			error = err.message;
 			currentStep = 'input';
 		}
 	}
 	
-	function handleConfirm() {
-		transactionState.update(s => ({ ...s, nlpIntent: intentData }));
-		goto('/umkm/matching');
+	async function handleConfirm() {
+		currentStep = 'loading';
+		error = null;
+		
+		try {
+			// Use location from DB or fallback
+			const lat = data.latitude !== null ? data.latitude : -7.5666;
+			const lng = data.longitude !== null ? data.longitude : 110.8283;
+			
+			const orderPayload = {
+				umkmId: data.umkmId, // Retrieved from page.server.js
+				rawText: intentData.rawText,
+				commodity: intentData.intent.commodity,
+				quantityKg: intentData.intent.quantityKg,
+				minimumQuality: intentData.intent.minimumQuality,
+				neededDate: intentData.intent.neededDate,
+				latitude: lat,
+				longitude: lng,
+				nlpSource: 'openrouter-gemma-4',
+				confirmed: true
+			};
+			
+			const response = await createOrder(orderPayload);
+			
+			transactionState.update(s => ({ ...s, nlpIntent: intentData, currentOrderId: response.data.id }));
+			goto(`/umkm/matching?orderId=${response.data.id}`);
+		} catch (/** @type {any} */ err) {
+			error = err.message || 'Gagal membuat pesanan';
+			currentStep = 'confirm';
+		}
 	}
 	
 	function handleCancel() {
@@ -69,7 +108,7 @@
 			{:else if currentStep === 'confirm' && intentData}
 				<div class="card glass-card animate-scale-in">
 					<ExtractedIntentConfirm 
-						intent={intentData} 
+						intent={intentData.intent || intentData.partialIntent} 
 						onConfirm={handleConfirm}
 						onCancel={handleCancel}
 					/>

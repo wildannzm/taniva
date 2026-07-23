@@ -4,6 +4,7 @@
 	import { userRole, transactionState } from '$lib/stores/app.js';
 	import { searchMatching } from '$lib/api/matching.api.js';
 	import { getRouteEstimate } from '$lib/api/logistics.api.js';
+	import { page } from '$app/stores';
 	
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
@@ -22,14 +23,10 @@
 	/** @type {any} */
 	let routeData = $state(null);
 	
-	let intent = $state(null);
-	transactionState.subscribe(s => intent = s.nlpIntent);
-	
-	// Mock UMKM Location
-	const UMKM_LOC = { lat: -7.5666, lng: 110.8283 };
+	let orderId = $derived($page.url.searchParams.get('orderId'));
 	
 	onMount(() => {
-		if (!intent) {
+		if (!orderId) {
 			goto('/umkm/permintaan');
 			return;
 		}
@@ -42,32 +39,32 @@
 		
 		try {
 			const { data } = await searchMatching({
-				...(intent || {}),
-				umkm_lokasi: UMKM_LOC
+				orderId: orderId
 			});
 			matches = data.results || [];
 			transactionState.update(s => ({ ...s, matchingResults: matches }));
 			currentStep = 'results';
 		} catch (/** @type {any} */ err) {
-			error = err.message;
+			error = err.message || 'Terjadi kesalahan saat mencari petani';
 			currentStep = 'results';
 		}
 	}
 	
-	/** @param {any} match */
-	async function handleSelectFarmer(match) {
+	function handleSelectFarmer(match) {
 		selectedMatch = match;
 		currentStep = 'routing';
 		error = null;
 		
-		try {
-			const { data } = await getRouteEstimate(match.farmer_id, UMKM_LOC);
-			routeData = data;
-		} catch (/** @type {any} */ err) {
-			error = err.message;
-			currentStep = 'results';
-			selectedMatch = null;
-		}
+		routeData = {
+			jarak_km: match.totalDistance.toFixed(1),
+			estimasi_waktu_menit: match.allocations.reduce((/** @type {number} */ acc, /** @type {any} */ a) => acc + a.candidate.route.durationMinutes, 0),
+			estimasi_biaya: match.logisticsCost,
+			farmerLocs: match.allocations.map((/** @type {any} */ a) => ({ 
+				lat: Number(a.candidate.farmer.latitude), 
+				lng: Number(a.candidate.farmer.longitude),
+				name: a.candidate.farmer.name
+			}))
+		};
 	}
 	
 	function confirmOrder() {
@@ -135,7 +132,7 @@
 				<div class="success-icon">🎉</div>
 				<h2 class="success-title">Pesanan Berhasil Dibuat!</h2>
 				<p class="success-desc">
-					Sistem telah meneruskan pesanan Anda ke <strong>{selectedMatch?.farmer_nama}</strong>.
+					Sistem telah meneruskan pesanan Anda ke <strong>{selectedMatch?.allocations?.map((/** @type {any} */ a) => a.farmer.name).join(' & ')}</strong>.
 					Barang sedang disiapkan untuk dikirim.
 				</p>
 				<div class="success-actions">
