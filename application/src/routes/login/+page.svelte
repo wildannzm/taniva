@@ -1,6 +1,9 @@
 <script>
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { userRole } from '$lib/stores/app.js';
+	import { seedDatabase } from '$lib/stores/seeder.js';
+	import { logActivity } from '$lib/stores/activityLog.js';
 	
 	let authMode = $state('login'); // 'login' | 'register'
 	let username = $state('');
@@ -10,6 +13,10 @@
 	let selectedRole = $state('petani'); 
 	let isAuthenticating = $state(false);
 	let errorMsg = $state('');
+
+	onMount(() => {
+		seedDatabase();
+	});
 
 	/** @param {'login' | 'register'} mode */
 	function toggleMode(mode) {
@@ -42,11 +49,13 @@
 				users.push({ username, password, role: selectedRole });
 				localStorage.setItem('taniva_users', JSON.stringify(users));
 				userRole.set(selectedRole);
+				logActivity({ role: selectedRole, username, action: 'Register', detail: `Akun baru dibuat sebagai ${selectedRole}` });
 				goto(`/${selectedRole}`);
 			} else {
 				const user = users.find(u => u.username === username && u.password === password);
 				if (user) {
 					userRole.set(user.role);
+					logActivity({ role: user.role, username: user.username, action: 'Login', detail: `${user.username} login ke sistem` });
 					goto(`/${user.role}`);
 				} else {
 					errorMsg = 'Username atau kata sandi salah.';
@@ -104,32 +113,8 @@
 					<div class="input-line"></div>
 				</div>
 
-				{#if authMode === 'register'}
-					<div class="role-selector animate-expand">
-						<p class="role-label">Pilih Peran Anda</p>
-						<div class="role-grid">
-							<label class="role-card {selectedRole === 'petani' ? 'selected' : ''}">
-								<input type="radio" name="role" value="petani" bind:group={selectedRole} />
-								<div class="role-icon">🧑‍🌾</div>
-								<div class="role-text">
-									<span class="role-title">Petani</span>
-									<span class="role-desc">Penyedia Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-							
-							<label class="role-card {selectedRole === 'umkm' ? 'selected' : ''}">
-								<input type="radio" name="role" value="umkm" bind:group={selectedRole} />
-								<div class="role-icon">🏪</div>
-								<div class="role-text">
-									<span class="role-title">UMKM</span>
-									<span class="role-desc">Pembeli Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-						</div>
-					</div>
-				{/if}
+
+
 
 				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || username.trim().length < 3 || password.length < 3}>
 					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
@@ -396,8 +381,15 @@
 
 	.role-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	@media (min-width: 480px) {
+		.role-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+		}
 	}
 
 	.role-card {
