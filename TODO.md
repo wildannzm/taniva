@@ -39,9 +39,9 @@
 ### Ahmad Nur Ain — Backend Lead
 
 - [x] Finalisasi skema database PostgreSQL: Farmer, UMKM, HarvestBatch, Order, MatchResult, Rating (Bagian 10 PRD)
-- [ ] Implementasikan endpoint `POST /api/harvest/upload` (integrasi fungsi CV dari Abrar + generate hash SHA-256 + QR code) — FR-04, FR-08
-- [ ] Implementasikan endpoint `GET /api/harvest/{batch_id}/verify` — FR-09
-- [ ] Implementasikan algoritma Weighted Scoring (kualitas 40%, reputasi 35%, logistik 25%) di endpoint `POST /api/matching/search` — FR-10, FR-11, FR-12
+- [x] Implementasikan endpoint `POST /api/harvest/upload` (integrasi fungsi CV dari Abrar + generate hash SHA-256 + QR code) — FR-04, FR-08
+- [x] Implementasikan endpoint `GET /api/harvest/{batch_id}/verify` — FR-09
+- [x] Implementasikan algoritma Weighted Scoring (kualitas 40%, reputasi 35%, logistik 25%) di endpoint `POST /api/matching/search` — FR-10, FR-11, FR-12
 - [ ] Implementasikan endpoint `POST /api/feedback/rating` dan logika update reputasi otomatis — FR-16, FR-17
 - [ ] Implementasikan endpoint `GET /api/farmer/{id}/reputation`
 - [ ] Buat seed data dummy (beberapa petani, UMKM, batch panen) untuk kebutuhan demo dan testing
@@ -62,8 +62,8 @@
 
 - [x] Implementasikan wrapper pemanggilan OpenRouter/Groq API untuk ekstraksi intent (prompt engineering agar output JSON konsisten) — FR-02
 - [x] Implementasikan endpoint `POST /api/nlp/extract-intent`, hubungkan ke frontend Zacky
-- [ ] Implementasikan estimasi rute/biaya via OpenRouteService — endpoint `POST /api/logistics/route` — FR-14
-- [ ] Amankan seluruh API key (OpenRouter/Groq, OpenRouteService) sebagai environment variable, pastikan `.env` masuk `.gitignore`
+- [x] Implementasikan estimasi rute/biaya via OpenRouteService — endpoint `POST /api/logistics/route` — FR-14
+- [x] Amankan seluruh API key (OpenRouter/Groq, OpenRouteService) sebagai environment variable, pastikan `.env` masuk `.gitignore`
 - [ ] Siapkan hotspot/koneksi internet cadangan untuk mengantisipasi kegagalan API cloud saat demo (mitigasi risiko Bagian 13 PRD)
 - [ ] Siapkan fallback respons NLP statis (contoh hasil ekstraksi) untuk skenario darurat jika API cloud down saat demo
 - [ ] Jalankan uji integrasi end-to-end penuh (Fase 1 s.d. Fase 5 pada Bagian 8 PRD) bersama seluruh anggota
