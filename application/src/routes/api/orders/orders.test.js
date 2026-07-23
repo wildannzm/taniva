@@ -15,7 +15,7 @@ vi.mock('$lib/server/db/prisma', () => {
 	};
 });
 
-import prisma from '$lib/server/db/prisma';
+import { prisma } from '$lib/server/db/prisma';
 import { POST } from './+server.js';
 import { GET } from './[orderId]/+server.js';
 

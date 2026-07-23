@@ -28,22 +28,34 @@ export async function POST({ request }) {
 
 		if (result.status === 'complete') {
 			return json({
-				status: 'complete',
-				intent: result.intent,
-				missingFields: [],
-				clarificationQuestion: null
+				success: true,
+				data: {
+					rawText: validationResult.data.text,
+					status: 'complete',
+					intent: result.intent,
+					missingFields: [],
+					clarificationQuestion: null,
+					requiresConfirmation: true
+				},
+				meta: result.meta
 			});
 		} else {
 			return json({
-				status: 'needs_clarification',
-				partialIntent: result.partialIntent || {
-					commodity: 'tomato',
-					quantityKg: null,
-					minimumQuality: null,
-					neededDate: null
+				success: true,
+				data: {
+					rawText: validationResult.data.text,
+					status: 'needs_clarification',
+					partialIntent: result.partialIntent || {
+						commodity: 'tomato',
+						quantityKg: null,
+						minimumQuality: null,
+						neededDate: null
+					},
+					missingFields: result.missingFields || [],
+					clarificationQuestion: result.clarificationQuestion || 'Mohon lengkapi pesanan Anda.',
+					requiresConfirmation: false
 				},
-				missingFields: result.missingFields || [],
-				clarificationQuestion: result.clarificationQuestion || 'Mohon lengkapi pesanan Anda.'
+				meta: result.meta
 			});
 		}
 	} catch (error) {

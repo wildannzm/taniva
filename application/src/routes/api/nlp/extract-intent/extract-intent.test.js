@@ -35,6 +35,7 @@ const validIntent = {
 
 const successResult = {
 	rawText: 'Saya butuh 20 kg tomat kualitas bagus',
+	status: 'complete',
 	intent: validIntent,
 	requiresConfirmation: true,
 	meta: {

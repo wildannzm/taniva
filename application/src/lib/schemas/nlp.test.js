@@ -46,10 +46,15 @@ describe('extractIntentRequestSchema', () => {
 
 describe('intentSchema', () => {
 	const validIntent = {
-		commodity: 'tomato',
-		quantityKg: 20,
-		minimumQuality: 80,
-		neededDate: '2026-07-24'
+		status: 'complete',
+		intent: {
+			commodity: 'tomato',
+			quantityKg: 20,
+			minimumQuality: 80,
+			neededDate: '2026-07-24'
+		},
+		missingFields: [],
+		clarificationQuestion: null
 	};
 
 	it('accepts valid intent', () => {
@@ -59,52 +64,53 @@ describe('intentSchema', () => {
 	});
 
 	it('rejects commodity other than tomato', () => {
-		const result = intentSchema.safeParse({ ...validIntent, commodity: 'potato' });
+		const result = intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, commodity: 'potato' } });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects quantity <= 0', () => {
-		expect(intentSchema.safeParse({ ...validIntent, quantityKg: 0 }).success).toBe(false);
-		expect(intentSchema.safeParse({ ...validIntent, quantityKg: -5 }).success).toBe(false);
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, quantityKg: 0 } }).success).toBe(false);
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, quantityKg: -5 } }).success).toBe(false);
 	});
 
 	it('rejects NaN quantity', () => {
-		const result = intentSchema.safeParse({ ...validIntent, quantityKg: NaN });
+		const result = intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, quantityKg: NaN } });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects Infinity quantity', () => {
-		const result = intentSchema.safeParse({ ...validIntent, quantityKg: Infinity });
+		const result = intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, quantityKg: Infinity } });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects minimumQuality below 0', () => {
-		const result = intentSchema.safeParse({ ...validIntent, minimumQuality: -1 });
+		const result = intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, minimumQuality: -1 } });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects minimumQuality above 100', () => {
-		const result = intentSchema.safeParse({ ...validIntent, minimumQuality: 101 });
+		const result = intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, minimumQuality: 101 } });
 		expect(result.success).toBe(false);
 	});
 
 	it('accepts minimumQuality at boundaries', () => {
-		expect(intentSchema.safeParse({ ...validIntent, minimumQuality: 0 }).success).toBe(true);
-		expect(intentSchema.safeParse({ ...validIntent, minimumQuality: 100 }).success).toBe(true);
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, minimumQuality: 0 } }).success).toBe(true);
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, minimumQuality: 100 } }).success).toBe(true);
 	});
 
 	it('rejects date with wrong format', () => {
-		expect(intentSchema.safeParse({ ...validIntent, neededDate: '24-07-2026' }).success).toBe(
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, neededDate: '24-07-2026' } }).success).toBe(
 			false
 		);
-		expect(intentSchema.safeParse({ ...validIntent, neededDate: '2026/07/24' }).success).toBe(
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, neededDate: '2026/07/24' } }).success).toBe(
 			false
 		);
 	});
 
 	it('rejects invalid date (e.g. Feb 30)', () => {
-		const result = intentSchema.safeParse({ ...validIntent, neededDate: '2026-02-30' });
-		expect(result.success).toBe(false);
+		expect(intentSchema.safeParse({ ...validIntent, intent: { ...validIntent.intent, neededDate: '2026-02-30' } }).success).toBe(
+			false
+		);
 	});
 
 	it('rejects additional properties (strict mode)', () => {
@@ -113,8 +119,8 @@ describe('intentSchema', () => {
 	});
 
 	it('rejects missing required fields', () => {
-		const rest = { ...validIntent };
-		delete rest.commodity;
+		const rest = { ...validIntent, intent: { ...validIntent.intent } };
+		delete rest.intent.commodity;
 		expect(intentSchema.safeParse(rest).success).toBe(false);
 	});
 });
