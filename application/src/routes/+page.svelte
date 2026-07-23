@@ -22,14 +22,14 @@
 			<div class="nav-links">
 				<a href="#features" class="nav-ghost">Platform</a>
 				<a href="#how" class="nav-ghost">How it works</a>
-				{#if data.user}
+				{#if data?.user}
 					<button
 						class="btn-login"
 						onclick={() =>
 							goto(
-								data.user.role === 'ADMIN'
+								data.user?.role === 'ADMIN'
 									? '/admin'
-									: data.user.role === 'UMKM'
+									: data.user?.role === 'UMKM'
 										? '/umkm'
 										: '/petani'
 							)}>Dashboard</button
@@ -60,14 +60,14 @@
 					bagi Petani dan UMKM kuliner bertransaksi dengan keyakinan penuh.
 				</p>
 				<div class="hero-actions">
-					{#if data.user}
+					{#if data?.user}
 						<button
 							class="btn-primary"
 							onclick={() =>
 								goto(
-									data.user.role === 'ADMIN'
+									data.user?.role === 'ADMIN'
 										? '/admin'
-										: data.user.role === 'UMKM'
+										: data.user?.role === 'UMKM'
 											? '/umkm'
 											: '/petani'
 								)}
@@ -82,7 +82,7 @@
 					{/if}
 					<button
 						class="btn-acctual-secondary btn-lg"
-						onclick={() => document.getElementById('features').scrollIntoView()}
+						onclick={() => document.getElementById('features')?.scrollIntoView()}
 						>Pelajari Fitur</button
 					>
 				</div>
@@ -876,40 +876,5 @@
 		font-weight: 500;
 	}
 
-	/* Animations */
-	.animate-fade-in-up {
-		animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-		opacity: 0;
-	}
 
-	@keyframes fadeInUp {
-		from {
-			opacity: 0;
-			transform: translateY(40px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.animate-float-1 {
-		animation: float 6s ease-in-out infinite;
-	}
-	.animate-float-2 {
-		animation: float 7s ease-in-out infinite 1s;
-	}
-	.animate-float-3 {
-		animation: float 8s ease-in-out infinite 2s;
-	}
-
-	@keyframes float {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-20px);
-		}
-	}
 </style>

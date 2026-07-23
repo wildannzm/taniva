@@ -145,8 +145,14 @@
 		</header>
 		
 		<div class="content-area">
-			{#if currentStep === 'idle' || currentStep === 'validating'}
+			{#if currentStep === 'idle' || currentStep === 'validating' || currentStep === 'error'}
 				<div class="card glass-card form-container">
+					{#if currentStep === 'error'}
+						<ErrorBanner 
+							message={typeof globalError?.message === 'string' ? globalError.message : 'Terjadi kesalahan sistem'} 
+							onDismiss={() => currentStep = 'idle'}
+						/>
+					{/if}
 					<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 						<div class="form-group full-width">
 							<label class="form-label" for="photo">Foto Hasil Panen</label>
@@ -195,12 +201,6 @@
 				<div class="card glass-card">
 					<LoadingSpinner label={currentStep === 'uploading' ? "Mengunggah data..." : "AI sedang menganalisis kualitas tomat..."} />
 				</div>
-				
-			{:else if currentStep === 'error'}
-				<ErrorBanner 
-					message={typeof globalError?.message === 'string' ? globalError.message : 'Terjadi kesalahan sistem'} 
-					onDismiss={() => currentStep = 'idle'}
-				/>
 				
 			{:else if currentStep === 'success' && uploadResult}
 				<div class="result-container animate-fade-in">

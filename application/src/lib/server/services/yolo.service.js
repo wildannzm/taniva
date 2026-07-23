@@ -106,13 +106,26 @@ export class YoloService {
 		else if (qualityScore >= 50) qualityLabel = 'mixed';
 		else qualityLabel = 'rotten';
 
+		// FastAPI returns a relative path like `/results/result-...jpg`.
+		// We prepend the AI_SERVICE_URL so the frontend can display it directly via the img tag.
+		let finalImageUrl = data.annotatedImageUrl || '';
+		if (finalImageUrl.startsWith('/results')) {
+			try {
+				const origin = new URL(config.YOLO_SERVICE_URL).origin;
+				finalImageUrl = `${origin}${finalImageUrl}`;
+			} catch (e) {
+				// Fallback if URL is malformed
+				finalImageUrl = `http://localhost:8000${finalImageUrl}`;
+			}
+		}
+
 		return {
 			qualityScore,
 			qualityLabel,
 			freshCount,
 			rottenCount,
 			totalDetected,
-			annotatedImageUrl: data?.annotatedImageUrl || null,
+			annotatedImageUrl: finalImageUrl || null,
 			inferenceTimeMs,
 			source: 'yolov8-fastapi',
 			fallbackUsed: false
