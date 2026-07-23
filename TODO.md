@@ -3,6 +3,7 @@
 > Catatan: repositori GitHub bersifat privat sehingga breakdown ini disusun berdasarkan PRD/BRD dan pembagian peran pada proposal, bukan hasil audit kode aktual. Sesuaikan checklist dengan progres yang sudah ada di repo.
 >
 > Konteks waktu (mengikuti Guidebook BYTESFEST 2026, sistem Split-Phase):
+>
 > - **10-22 Juli** — pengembangan produk mandiri (di luar hari lomba)
 > - **22 Juli (hari ini, H-1)** — sprint terakhir menuntaskan MVP sebelum Hackathon Day
 > - **23 Juli** — Hackathon Day, khusus integrasi 2 constraint kejutan dari panitia
@@ -13,11 +14,11 @@
 
 ## 1. Pembagian Peran dan Kepemilikan Modul
 
-| Anggota | Peran (Proposal) | Modul yang Dipegang (PRD) |
-|---|---|---|
-| **Abrar Wahid** | Ketua Tim / AI-ML Engineer | Trust Layer (FR-04 s.d. FR-09): CLAHE, YOLOv8, skor kualitas, sertifikat QR |
-| **Ahmad Nur Ain** | Backend Lead | Intelligence Layer, Feedback Layer, basis data, seluruh endpoint FastAPI (FR-10, FR-11, FR-12, FR-16, FR-17) |
-| **Zacky Hafsari** | Frontend Lead | Seluruh antarmuka SvelteKit (konsumsi API dari FR-01 s.d. FR-19) |
+| Anggota                  | Peran (Proposal)                    | Modul yang Dipegang (PRD)                                                                                                        |
+| ------------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Abrar Wahid**          | Ketua Tim / AI-ML Engineer          | Trust Layer (FR-04 s.d. FR-09): CLAHE, YOLOv8, skor kualitas, sertifikat QR                                                      |
+| **Ahmad Nur Ain**        | Backend Lead                        | Intelligence Layer, Feedback Layer, basis data, seluruh endpoint FastAPI (FR-10, FR-11, FR-12, FR-16, FR-17)                     |
+| **Zacky Hafsari**        | Frontend Lead                       | Seluruh antarmuka SvelteKit (konsumsi API dari FR-01 s.d. FR-19)                                                                 |
 | **Wildan Zhilal Manafi** | Full-stack & Koordinator Constraint | NLP Bridge (FR-02, FR-03), Action Layer (FR-14, FR-15), integrasi API key, repo/DevOps, dan koordinasi respons constraint hari-H |
 
 ---
@@ -25,17 +26,19 @@
 ## 2. To-Do List Sprint Akhir — Hari Ini (22 Juli)
 
 ### Abrar Wahid — AI/ML Engineer
-- [ ] Finalisasi subset dataset fresh/rotten tomat (Kaggle/Roboflow Universe), buang gambar noise/ambigu
-- [ ] Latih atau fine-tune ulang YOLOv8 khusus 2 kelas (fresh, rotten), simpan bobot model final
-- [ ] Implementasikan pra-pemrosesan CLAHE sebelum inferensi (FR-05)
-- [ ] Bungkus inferensi model menjadi fungsi/endpoint yang menerima gambar dan mengembalikan bounding box + confidence
-- [ ] Implementasikan kalkulasi Skor Kualitas Agregat 0-100 dari hasil deteksi (FR-07)
+
+- [x] Finalisasi subset dataset fresh/rotten tomat (Kaggle/Roboflow Universe), buang gambar noise/ambigu
+- [x] Latih atau fine-tune ulang YOLOv8 khusus 2 kelas (fresh, rotten), simpan bobot model final
+- [x] Implementasikan pra-pemrosesan CLAHE sebelum inferensi (FR-05)
+- [x] Bungkus inferensi model menjadi fungsi/endpoint yang menerima gambar dan mengembalikan bounding box + confidence
+- [x] Implementasikan kalkulasi Skor Kualitas Agregat 0-100 dari hasil deteksi (FR-07)
 - [ ] Ekspor model ke format ringan (ONNX/FP16) agar inferensi < 3 detik sesuai NFR
-- [ ] Serahkan fungsi inferensi ke Ahmad untuk dibungkus jadi endpoint `/api/harvest/upload`
+- [x] Serahkan fungsi inferensi ke Ahmad untuk dibungkus jadi endpoint `/api/harvest/upload`
 - [ ] Siapkan 5-10 sampel foto teruji (fresh & rotten) sebagai bahan demo cadangan
 
 ### Ahmad Nur Ain — Backend Lead
-- [ ] Finalisasi skema database PostgreSQL: Farmer, UMKM, HarvestBatch, Order, MatchResult, Rating (Bagian 10 PRD)
+
+- [x] Finalisasi skema database PostgreSQL: Farmer, UMKM, HarvestBatch, Order, MatchResult, Rating (Bagian 10 PRD)
 - [ ] Implementasikan endpoint `POST /api/harvest/upload` (integrasi fungsi CV dari Abrar + generate hash SHA-256 + QR code) — FR-04, FR-08
 - [ ] Implementasikan endpoint `GET /api/harvest/{batch_id}/verify` — FR-09
 - [ ] Implementasikan algoritma Weighted Scoring (kualitas 40%, reputasi 35%, logistik 25%) di endpoint `POST /api/matching/search` — FR-10, FR-11, FR-12
@@ -45,18 +48,20 @@
 - [ ] Tulis dokumentasi ringkas kontrak API (request/response) agar Zacky bisa integrasi tanpa menunggu
 
 ### Zacky Hafsari — Frontend Lead
-- [ ] Setup project SvelteKit final (struktur folder, routing, layout dasar mobile-first)
-- [ ] Halaman unggah foto panen (petani) + tampilan hasil skor kualitas dan QR code — FR-04, FR-08
-- [ ] Halaman input permintaan bahasa natural (UMKM) + tampilan hasil ekstraksi untuk dikonfirmasi — FR-01, FR-03
-- [ ] Halaman hasil matching (daftar petani terurut + breakdown skor) — FR-12
-- [ ] Halaman pindai ulang QR Code untuk validasi saat barang tiba — FR-09
-- [ ] Halaman form rating 1-5 — FR-16
-- [ ] Dashboard ringkas status transaksi per role (opsional, Could Have) — FR-19
+
+- [x] Setup project SvelteKit final (struktur folder, routing, layout dasar mobile-first)
+- [x] Halaman unggah foto panen (petani) + tampilan hasil skor kualitas dan QR code — FR-04, FR-08
+- [x] Halaman input permintaan bahasa natural (UMKM) + tampilan hasil ekstraksi untuk dikonfirmasi — FR-01, FR-03
+- [x] Halaman hasil matching (daftar petani terurut + breakdown skor) — FR-12
+- [x] Halaman pindai ulang QR Code untuk validasi saat barang tiba — FR-09
+- [x] Halaman form rating 1-5 — FR-16
+- [x] Dashboard ringkas status transaksi per role (opsional, Could Have) — FR-19
 - [ ] Pastikan seluruh state loading/error ditangani dengan baik agar tidak "blank" saat demo
 
 ### Wildan Zhilal Manafi — Full-stack & Koordinator Constraint
-- [ ] Implementasikan wrapper pemanggilan OpenRouter/Groq API untuk ekstraksi intent (prompt engineering agar output JSON konsisten) — FR-02
-- [ ] Implementasikan endpoint `POST /api/nlp/extract-intent`, hubungkan ke frontend Zacky
+
+- [x] Implementasikan wrapper pemanggilan OpenRouter/Groq API untuk ekstraksi intent (prompt engineering agar output JSON konsisten) — FR-02
+- [x] Implementasikan endpoint `POST /api/nlp/extract-intent`, hubungkan ke frontend Zacky
 - [ ] Implementasikan estimasi rute/biaya via OpenRouteService — endpoint `POST /api/logistics/route` — FR-14
 - [ ] Amankan seluruh API key (OpenRouter/Groq, OpenRouteService) sebagai environment variable, pastikan `.env` masuk `.gitignore`
 - [ ] Siapkan hotspot/koneksi internet cadangan untuk mengantisipasi kegagalan API cloud saat demo (mitigasi risiko Bagian 13 PRD)
@@ -79,15 +84,15 @@
 
 ## 4. Protokol Hackathon Day (23 Juli — Gedung G FKIP UNS)
 
-| Waktu | Aktivitas | Penanggung Jawab Utama |
-|---|---|---|
-| 07.30 - 09.30 | Setup laptop, jalankan backend & frontend lokal, verifikasi API key masih berfungsi | Wildan (koordinasi), semua anggota |
-| 09.30 | Terima **Constraint 1** (teknis-fungsional) | Wildan mencatat & memetakan ke modul terkait |
-| 09.30 - 13.00 | Integrasi Constraint 1 ke modul yang relevan (kemungkinan Trust Layer/Backend) | PIC ditentukan sesuai isi constraint saat itu |
-| 13.00 | Terima **Constraint 2** (kontekstual) | Wildan mencatat & memetakan ulang asumsi solusi |
-| 13.00 - 16.00 | Integrasi Constraint 2 | PIC ditentukan sesuai isi constraint saat itu |
-| 16.00 - 17.00 | Stabilisasi, uji ulang alur end-to-end, perbaikan bug prioritas tinggi | Semua anggota |
-| Menjelang batas akhir | Push final ke GitHub, submit output sesuai media panitia | Wildan |
+| Waktu                 | Aktivitas                                                                           | Penanggung Jawab Utama                          |
+| --------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 07.30 - 09.30         | Setup laptop, jalankan backend & frontend lokal, verifikasi API key masih berfungsi | Wildan (koordinasi), semua anggota              |
+| 09.30                 | Terima **Constraint 1** (teknis-fungsional)                                         | Wildan mencatat & memetakan ke modul terkait    |
+| 09.30 - 13.00         | Integrasi Constraint 1 ke modul yang relevan (kemungkinan Trust Layer/Backend)      | PIC ditentukan sesuai isi constraint saat itu   |
+| 13.00                 | Terima **Constraint 2** (kontekstual)                                               | Wildan mencatat & memetakan ulang asumsi solusi |
+| 13.00 - 16.00         | Integrasi Constraint 2                                                              | PIC ditentukan sesuai isi constraint saat itu   |
+| 16.00 - 17.00         | Stabilisasi, uji ulang alur end-to-end, perbaikan bug prioritas tinggi              | Semua anggota                                   |
+| Menjelang batas akhir | Push final ke GitHub, submit output sesuai media panitia                            | Wildan                                          |
 
 Karena isi kedua constraint baru diketahui saat hari-H, PIC eksekusi ditentukan langsung berdasarkan modul mana yang terdampak, mengikuti prinsip pada Bagian 8 PRD: arsitektur modular (microservices-lite) memungkinkan perubahan diisolasi ke lapisan yang relevan tanpa merombak sistem utama.
 
