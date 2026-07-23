@@ -153,3 +153,64 @@ rendah / tidak mensyaratkan kualitas -> 0`;
 		clearTimeout(timeoutId);
 	}
 }
+
+/**
+ * @param {any} metrics
+ * @param {any[]} incidents
+ * @returns {Promise<string>}
+ */
+export async function generateImpactRecommendation(metrics, incidents) {
+	const config = getConfig();
+	const controller = new AbortController();
+	// Allow longer timeout for this analysis
+	const timeoutId = setTimeout(() => controller.abort(), config.NLP_TIMEOUT_MS * 2);
+
+	try {
+		const systemPrompt = `Anda adalah asisten AI 'Taniva' yang menganalisis rantai pasok agrikultur.
+Tugas Anda adalah membaca metrik dan log insiden berikut, lalu memberikan SATU paragraf singkat (maksimal 3 kalimat) berupa insight dan rekomendasi tindak lanjut operasional.
+Gunakan bahasa Indonesia yang profesional dan langsung pada intinya. Fokus pada masalah paling kritis (contoh: kualitas busuk atau pesanan dibatalkan). Jangan berikan pengantar atau penutup.`;
+
+		const dataContext = JSON.stringify({
+			Metrik: metrics,
+			Insiden_Terbaru: incidents.slice(0, 5)
+		}, null, 2);
+
+		const response = await fetch(`${config.OPENROUTER_BASE_URL}/chat/completions`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${config.OPENROUTER_API_KEY}`,
+				'Content-Type': 'application/json',
+				'HTTP-Referer': config.PUBLIC_APP_URL,
+				'X-OpenRouter-Title': config.OPENROUTER_APP_NAME
+			},
+			body: JSON.stringify({
+				model: config.OPENROUTER_MODEL,
+				messages: [
+					{ role: 'system', content: systemPrompt },
+					{ role: 'user', content: dataContext }
+				],
+				temperature: 0.3,
+				max_tokens: 150
+			}),
+			signal: controller.signal
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			console.error(`OpenRouter API failed with status ${response.status}:`, errorText);
+			throw new Error('Failed to generate AI recommendation');
+		}
+
+		const data = await response.json();
+		if (!data.choices?.[0]?.message?.content) {
+			throw new Error('Invalid response from AI');
+		}
+
+		return data.choices[0].message.content;
+	} catch (error) {
+		console.error('AI Recommendation Error:', error);
+		return 'Sistem AI saat ini tidak dapat memberikan rekomendasi. Silakan evaluasi metrik dan log insiden secara manual untuk menentukan tindak lanjut.';
+	} finally {
+		clearTimeout(timeoutId);
+	}
+}
