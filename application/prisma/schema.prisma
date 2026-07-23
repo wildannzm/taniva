@@ -126,7 +126,7 @@ model HarvestBatch {
   updatedAt           DateTime                @updatedAt @map("updated_at")
 
   @@index([farmerId])
-  @@index([status, commodity, qualityScore, availableDate])
+  @@index([status, commodity, qualityScore, availableDate], map: "idx_harvest_batches_search")
   @@index([availableDate])
   @@map("harvest_batches")
 }
