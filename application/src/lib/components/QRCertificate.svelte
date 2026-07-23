@@ -10,16 +10,27 @@
 	</div>
 	
 	<div class="qr-placeholder">
-		<!-- In a real app we'd use qrcode library here to generate QR from payload -->
-		<div class="qr-mock">
-			<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-				<rect x="3" y="3" width="7" height="7" rx="1"/>
-				<rect x="14" y="3" width="7" height="7" rx="1"/>
-				<rect x="14" y="14" width="7" height="7" rx="1"/>
-				<rect x="3" y="14" width="7" height="7" rx="1"/>
-				<path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01M11 10h2M10 14h4"/>
-			</svg>
-		</div>
+		{#if verifyUrl}
+			<div class="qr-code-wrapper">
+				<img 
+					src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(verifyUrl)}`} 
+					alt="QR Code" 
+					width="120" 
+					height="120" 
+					class="qr-image"
+				/>
+			</div>
+		{:else}
+			<div class="qr-mock">
+				<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="3" width="7" height="7" rx="1"/>
+					<rect x="14" y="3" width="7" height="7" rx="1"/>
+					<rect x="14" y="14" width="7" height="7" rx="1"/>
+					<rect x="3" y="14" width="7" height="7" rx="1"/>
+					<path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01M11 10h2M10 14h4"/>
+				</svg>
+			</div>
+		{/if}
 		<p class="qr-hint">Scan untuk validasi</p>
 	</div>
 
@@ -80,13 +91,22 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.qr-mock {
+	.qr-mock, .qr-code-wrapper {
 		background: white;
 		padding: 0.5rem;
 		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-outline-variant);
 		color: var(--color-on-surface);
 		margin-bottom: 0.5rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.qr-image {
+		display: block;
+		max-width: 100%;
+		height: auto;
 	}
 
 	.qr-hint {

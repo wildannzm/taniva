@@ -5,11 +5,7 @@
 	
 	let { data } = $props();
 	
-	let recentHarvests = $state([
-		{ id: 'BATCH-001', date: 'Hari ini, 08:30', quality: 92, weight: '50 kg', status: 'verified' },
-		{ id: 'BATCH-002', date: 'Kemarin, 14:15', quality: 85, weight: '120 kg', status: 'verified' },
-		{ id: 'BATCH-003', date: '12 Jun 2026', quality: 78, weight: '45 kg', status: 'alert' }
-	]);
+	let recentHarvests = $derived(data.recentHarvests || []);
 
 	onMount(() => {
 		userRole.set('petani');
@@ -28,8 +24,8 @@
 			<div class="reputation-badge animate-slide-up" style="animation-delay: 100ms;">
 				<div class="star-icon">⭐</div>
 				<div class="rep-text">
-					<span class="score">4.8</span>
-					<span class="label">Reputasi Tinggi</span>
+					<span class="score">{data.stats?.reputasi || 0}</span>
+					<span class="label">Reputasi {(data.stats?.reputasi || 0) >= 80 ? 'Tinggi' : ((data.stats?.reputasi || 0) >= 50 ? 'Menengah' : 'Rendah')}</span>
 				</div>
 			</div>
 		</div>
@@ -43,14 +39,14 @@
 					<div class="stat-icon primary-light">📦</div>
 					<div class="stat-info">
 						<div class="stat-label">Total Panen Terjual</div>
-						<div class="stat-value">345 <span class="unit">kg</span></div>
+						<div class="stat-value">{data.stats?.totalPanenTerjual || 0} <span class="unit">kg</span></div>
 					</div>
 				</div>
 				<div class="stat-card glass-card">
 					<div class="stat-icon primary-light">⭐</div>
 					<div class="stat-info">
 						<div class="stat-label">Rata-rata Kualitas</div>
-						<div class="stat-value">88.5 <span class="unit">/ 100</span></div>
+						<div class="stat-value">{data.stats?.rataKualitas || 0} <span class="unit">/ 100</span></div>
 					</div>
 				</div>
 			</section>
@@ -87,7 +83,7 @@
 						<div class="section-header">
 							<h2 class="section-title">Skor Kualitas Bulan Ini</h2>
 						</div>
-						<QualityScoreCard score={88.5} />
+						<QualityScoreCard score={data.stats?.rataKualitas || 0} />
 					</section>
 				</div>
 
@@ -96,11 +92,11 @@
 					<section class="section-card animate-slide-up" style="animation-delay: 500ms;">
 						<div class="section-header">
 							<h2 class="section-title">Riwayat Panen</h2>
-							<button class="btn-link">Lihat Semua</button>
+							<a href="/petani/riwayat" class="btn-link">Lihat Semua</a>
 						</div>
 						<div class="history-list">
 							{#each recentHarvests as harvest}
-								<div class="history-item">
+								<a href={harvest.certificateCode ? `/verify/${harvest.certificateCode}` : '#'} class="history-item {harvest.certificateCode ? 'hoverable' : ''}">
 									<div class="status-indicator {harvest.status}">
 										{#if harvest.status === 'verified'}
 											✓
@@ -122,7 +118,7 @@
 											<span class="m-val score-{harvest.quality >= 90 ? 'a' : harvest.quality >= 80 ? 'b' : 'c'}">{harvest.quality}</span>
 										</div>
 									</div>
-								</div>
+								</a>
 							{/each}
 						</div>
 					</section>
@@ -457,18 +453,22 @@
 	.history-item {
 		display: flex;
 		align-items: center;
+		background: var(--color-surface);
+		border-radius: var(--radius-md);
 		padding: 1rem;
-		border-radius: 12px;
-		background: #f9fafb;
-		border: 1px solid transparent;
-		transition: all 0.2s;
+		border: 1px solid var(--color-outline-variant);
+		transition: all 0.2s ease;
+		text-decoration: none;
+		color: inherit;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
 	}
 
-	.history-item:hover {
-		background: #ffffff;
-		border-color: #e5e7eb;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-		transform: translateX(4px);
+	.history-item.hoverable:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		border-color: var(--color-primary-container);
 	}
 
 	.status-indicator {
