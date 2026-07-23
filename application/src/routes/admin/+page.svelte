@@ -3,6 +3,8 @@
 	import { userRole } from '$lib/stores/app.js';
 	import { activityLog, getActivitySummary } from '$lib/stores/activityLog.js';
 
+	let { data } = $props();
+
 	userRole.set('admin');
 
 	/** @type {{ totalUsers: number, todayActivities: number, roleDist: Record<string, number>, recentActivities: import('$lib/stores/activityLog.js').ActivityEntry[] }} */
@@ -64,7 +66,7 @@
 		<div class="mesh-bg"></div>
 		<div class="hero-content">
 			<div class="hero-text animate-slide-up">
-				<h1 class="page-title">Dashboard Monitoring</h1>
+				<h1 class="page-title">Dashboard {data.user?.name || 'Admin'}</h1>
 				<p class="page-subtitle">Pantau seluruh aktivitas ekosistem Taniva secara real-time.</p>
 				<a href="/admin/impact" class="impact-link-btn">Lihat Smart Impact Dashboard →</a>
 			</div>

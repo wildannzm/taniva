@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { userRole } from '$lib/stores/app.js';
 	
+	let { data } = $props();
+	
 	let recentOrders = $state([
 		{ id: 'ORD-001', date: 'Hari ini, 09:00', farmer: 'Pak Slamet', weight: '50 kg', status: 'pending' },
 		{ id: 'ORD-002', date: 'Kemarin, 10:30', farmer: 'Bu Tani', weight: '20 kg', status: 'completed' },
@@ -19,7 +21,7 @@
 		<div class="mesh-bg"></div>
 		<div class="hero-content">
 			<div class="hero-text animate-slide-up">
-				<h1 class="page-title">Halo, Mitra UMKM!</h1>
+				<h1 class="page-title">Halo, {data.user?.name}!</h1>
 				<p class="page-subtitle">Pantau pasokan, cari bahan baku, dan pastikan kualitas tomat terbaik untuk produksi Anda.</p>
 			</div>
 			<div class="system-status animate-slide-up" style="animation-delay: 100ms;">
