@@ -10,3 +10,4 @@ Thumbs.db
 skills-lock.json
 .agents
 runs/
+.vscode

@@ -4,11 +4,7 @@
 	
 	let { data } = $props();
 	
-	let recentOrders = $state([
-		{ id: 'ORD-001', date: 'Hari ini, 09:00', farmer: 'Pak Slamet', weight: '50 kg', status: 'pending' },
-		{ id: 'ORD-002', date: 'Kemarin, 10:30', farmer: 'Bu Tani', weight: '20 kg', status: 'completed' },
-		{ id: 'ORD-003', date: '11 Jun 2026', farmer: 'Pak Budi', weight: '100 kg', status: 'completed' }
-	]);
+	let recentOrders = $derived(data.recentOrders || []);
 
 	onMount(() => {
 		userRole.set('umkm');
@@ -39,14 +35,14 @@
 					<div class="stat-icon primary-light">📈</div>
 					<div class="stat-info">
 						<div class="stat-label">Volume Bulan Ini</div>
-						<div class="stat-value">850 <span class="unit">kg</span></div>
+						<div class="stat-value">{data.stats?.volumeBulanIni || 0} <span class="unit">kg</span></div>
 					</div>
 				</div>
 				<div class="stat-card glass-card">
 					<div class="stat-icon primary-light">🤝</div>
 					<div class="stat-info">
 						<div class="stat-label">Tingkat Kepuasan</div>
-						<div class="stat-value text-green">94%</div>
+						<div class="stat-value text-green">{data.stats?.tingkatKepuasan || 0}%</div>
 					</div>
 				</div>
 			</section>
@@ -84,34 +80,42 @@
 					<section class="section-card animate-slide-up" style="animation-delay: 400ms;">
 						<div class="section-header">
 							<h2 class="section-title">Pesanan Terakhir</h2>
-							<button class="btn-link">Lihat Semua</button>
+							<a href="/umkm/riwayat" class="btn-link">Lihat Semua</a>
 						</div>
 						<div class="history-list">
-							{#each recentOrders as order}
-								<div class="history-item">
-									<div class="status-indicator {order.status}">
-										{#if order.status === 'completed'}
-											✓
-										{:else}
-											⏱
-										{/if}
-									</div>
-									<div class="history-info">
-										<h4>{order.id}</h4>
-										<p>{order.date}</p>
-									</div>
-									<div class="history-metrics">
-										<div class="metric">
-											<span class="m-label">Petani</span>
-											<span class="m-val text-primary">{order.farmer}</span>
-										</div>
-										<div class="metric">
-											<span class="m-label">Berat</span>
-											<span class="m-val">{order.weight}</span>
-										</div>
-									</div>
+							{#if recentOrders.length === 0}
+								<div class="empty-state" style="text-align: center; padding: 2rem 1rem; background: #f9fafb; border-radius: 0.75rem;">
+									<div style="font-size: 2rem; margin-bottom: 0.5rem; color: #a1a1aa;">📋</div>
+									<h4 style="color: #52525b; font-weight: 500; margin-bottom: 0.25rem;">Belum ada pesanan</h4>
+									<p style="color: #71717a; font-size: 0.875rem;">Buat pesanan pertama Anda melalui "Pesan Pintar"</p>
 								</div>
-							{/each}
+							{:else}
+								{#each recentOrders as order}
+									<div class="history-item">
+										<div class="status-indicator {order.status}">
+											{#if order.status === 'completed'}
+												✓
+											{:else}
+												⏱
+											{/if}
+										</div>
+										<div class="history-info">
+											<h4>{order.id}</h4>
+											<p>{order.date}</p>
+										</div>
+										<div class="history-metrics">
+											<div class="metric">
+												<span class="m-label">Petani</span>
+												<span class="m-val text-primary">{order.farmer}</span>
+											</div>
+											<div class="metric">
+												<span class="m-label">Berat</span>
+												<span class="m-val">{order.weight}</span>
+											</div>
+										</div>
+									</div>
+								{/each}
+							{/if}
 						</div>
 					</section>
 				</div>

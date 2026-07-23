@@ -40,14 +40,17 @@ export const LogisticsService = {
 
 		// Helper to return Haversine fallback
 		const getFallback = () => {
-			const distKm = calculateHaversineDistance(
-				origin.latitude,
-				origin.longitude,
-				destination.latitude,
-				destination.longitude
-			);
-			// Round to 1 decimal place for consistency
-			const distanceKm = Math.round(distKm * 10) / 10;
+			let distanceKm = 0;
+			if (origin.latitude != null && origin.longitude != null && destination.latitude != null && destination.longitude != null) {
+				const distKm = calculateHaversineDistance(
+					origin.latitude,
+					origin.longitude,
+					destination.latitude,
+					destination.longitude
+				);
+				distanceKm = Math.round(distKm * 10) / 10;
+			}
+
 			const estimatedCost = calculateCost(distanceKm);
 
 			return {

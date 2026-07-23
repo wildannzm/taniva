@@ -46,9 +46,7 @@ export const MatchingService = {
 			where: {
 				commodity: order.commodity,
 				status: 'AVAILABLE',
-				remainingQuantityKg: { gt: 0 },
-				qualityScore: { gte: order.minimumQuality },
-				availableDate: { lte: order.neededDate }
+				remainingQuantityKg: { gt: 0 }
 			},
 			include: {
 				farmer: true,
@@ -76,7 +74,25 @@ export const MatchingService = {
 			const reputationContribution = reputationScore * REPUTATION_WEIGHT;
 			const logisticsContribution = logisticsScore * LOGISTICS_WEIGHT;
 
-			const totalScore = qualityContribution + reputationContribution + logisticsContribution;
+			let totalScore = qualityContribution + reputationContribution + logisticsContribution;
+
+			// Soft Matching Penalties
+			let penalties = [];
+			
+			if (qualityScore < order.minimumQuality) {
+				const gap = order.minimumQuality - qualityScore;
+				totalScore -= gap * 1.5; // deduct score significantly based on gap
+				penalties.push(`Kualitas (Grade ${qualityScore}) di bawah permintaan (Grade ${order.minimumQuality})`);
+			}
+			
+			const bDate = new Date(batch.availableDate).setHours(0,0,0,0);
+			const oDate = new Date(order.neededDate).setHours(0,0,0,0);
+			if (bDate > oDate) {
+				totalScore -= 40; // Heavy penalty for late delivery
+				penalties.push('Tersedia melewati tenggat waktu');
+			}
+			
+			totalScore = Math.max(0, totalScore);
 			
 			// Format as a full object for easy consumption
 			scoredCandidates.push({
@@ -84,6 +100,7 @@ export const MatchingService = {
 				farmer: batch.farmer,
 				certificate: batch.certificate,
 				route,
+				penalties,
 				scores: {
 					qualityScore,
 					reputationScore,
@@ -112,7 +129,7 @@ export const MatchingService = {
 				const logisticsCost = candidate.route.estimatedCost;
 
 				singleOptions.push({
-					type: 'split', // API says type "split" or "single", but wait, API.md says type: "split" or "single"
+					type: 'single', // Change to single
 					isSingle: true,
 					totalScore: candidate.scores.totalScore,
 					grandTotal: productSubtotal + logisticsCost,
@@ -120,6 +137,7 @@ export const MatchingService = {
 					aggregateQuality: candidate.scores.qualityScore,
 					aggregateReputation: candidate.scores.reputationScore,
 					aggregateLogistics: candidate.scores.logisticsScore,
+					penjelasan_nlp: candidate.penalties && candidate.penalties.length > 0 ? "⚠️ " + candidate.penalties.join('. ') : "✅ Sangat cocok dengan kriteria Anda.",
 					productSubtotal,
 					logisticsCost,
 					fulfilledQuantityKg: orderQuantityKg,
@@ -139,76 +157,81 @@ export const MatchingService = {
 
 		if (singleOptions.length > 0) {
 			options.push(...singleOptions);
-		} else {
-			// 5. Find Max 2-Supplier Split Options
-			/** @type {any[]} */
-			const splitOptions = [];
-			for (let i = 0; i < scoredCandidates.length; i++) {
-				for (let j = i + 1; j < scoredCandidates.length; j++) {
-					const c1 = scoredCandidates[i];
-					const c2 = scoredCandidates[j];
+		}
+		
+		// 5. Find Max 2-Supplier Split Options (Always evaluate even if single options exist)
+		/** @type {any[]} */
+		const splitOptions = [];
+		for (let i = 0; i < scoredCandidates.length; i++) {
+			for (let j = i + 1; j < scoredCandidates.length; j++) {
+				const c1 = scoredCandidates[i];
+				const c2 = scoredCandidates[j];
 
-					// Must be different farmers
-					if (c1.farmer.id === c2.farmer.id) continue;
+				// Must be different farmers
+				if (c1.farmer.id === c2.farmer.id) continue;
 
-					const qty1 = Number(c1.batch.remainingQuantityKg);
-					const qty2 = Number(c2.batch.remainingQuantityKg);
+				const qty1 = Number(c1.batch.remainingQuantityKg);
+				const qty2 = Number(c2.batch.remainingQuantityKg);
 
-					if (qty1 + qty2 >= orderQuantityKg) {
-						// c1 is guaranteed to have higher score than c2 because array is sorted
-						const alloc1 = qty1; // Takes max possible since it can't fulfill entirely alone (no single option)
-						const alloc2 = orderQuantityKg - alloc1;
+				if (qty1 + qty2 >= orderQuantityKg) {
+					// c1 is guaranteed to have higher score than c2 because array is sorted
+					const alloc1 = qty1; // Takes max possible since it can't fulfill entirely alone (no single option)
+					const alloc2 = orderQuantityKg - alloc1;
 
-						if (alloc2 <= qty2 && alloc2 > 0) {
-							// Calculate aggregates (Quantity-weighted)
-							const aggQuality = (alloc1 * c1.scores.qualityScore + alloc2 * c2.scores.qualityScore) / orderQuantityKg;
-							const aggReputation = (alloc1 * c1.scores.reputationScore + alloc2 * c2.scores.reputationScore) / orderQuantityKg;
-							const aggLogistics = (alloc1 * c1.scores.logisticsScore + alloc2 * c2.scores.logisticsScore) / orderQuantityKg;
-							
-							const totalScore = (aggQuality * QUALITY_WEIGHT) + (aggReputation * REPUTATION_WEIGHT) + (aggLogistics * LOGISTICS_WEIGHT);
+					if (alloc2 <= qty2 && alloc2 > 0) {
+						// Calculate aggregates (Quantity-weighted)
+						const aggQuality = (alloc1 * c1.scores.qualityScore + alloc2 * c2.scores.qualityScore) / orderQuantityKg;
+						const aggReputation = (alloc1 * c1.scores.reputationScore + alloc2 * c2.scores.reputationScore) / orderQuantityKg;
+						const aggLogistics = (alloc1 * c1.scores.logisticsScore + alloc2 * c2.scores.logisticsScore) / orderQuantityKg;
+						
+						const totalScore = (aggQuality * QUALITY_WEIGHT) + (aggReputation * REPUTATION_WEIGHT) + (aggLogistics * LOGISTICS_WEIGHT);
 
-							const subtotal1 = alloc1 * c1.batch.pricePerKg;
-							const subtotal2 = alloc2 * c2.batch.pricePerKg;
-							const productSubtotal = subtotal1 + subtotal2;
-							
-							const logisticsCost = c1.route.estimatedCost + c2.route.estimatedCost;
-							const grandTotal = productSubtotal + logisticsCost;
+						const subtotal1 = alloc1 * c1.batch.pricePerKg;
+						const subtotal2 = alloc2 * c2.batch.pricePerKg;
+						const productSubtotal = subtotal1 + subtotal2;
+						
+						const logisticsCost = c1.route.estimatedCost + c2.route.estimatedCost;
+						const grandTotal = productSubtotal + logisticsCost;
 
-							splitOptions.push({
-								isSingle: false,
-								totalScore,
-								grandTotal,
-								totalDistance: c1.route.distanceKm + c2.route.distanceKm,
-								aggregateQuality: aggQuality,
-								aggregateReputation: aggReputation,
-								aggregateLogistics: aggLogistics,
-								productSubtotal,
-								logisticsCost,
-								fulfilledQuantityKg: orderQuantityKg,
-								shortageQuantityKg: 0,
-								allocations: [
-									{
-										candidate: c1,
-										allocatedQuantityKg: alloc1,
-										pricePerKg: c1.batch.pricePerKg,
-										productSubtotal: subtotal1,
-										logisticsCost: c1.route.estimatedCost
-									},
-									{
-										candidate: c2,
-										allocatedQuantityKg: alloc2,
-										pricePerKg: c2.batch.pricePerKg,
-										productSubtotal: subtotal2,
-										logisticsCost: c2.route.estimatedCost
-									}
-								]
-							});
-						}
+						splitOptions.push({
+							isSingle: false,
+							totalScore,
+							grandTotal,
+							totalDistance: c1.route.distanceKm + c2.route.distanceKm,
+							aggregateQuality: aggQuality,
+							aggregateReputation: aggReputation,
+							aggregateLogistics: aggLogistics,
+							penjelasan_nlp: (() => {
+								const p = [...c1.penalties, ...c2.penalties];
+								const uniq = [...new Set(p)];
+								return uniq.length > 0 ? "⚠️ " + uniq.join('. ') : "✅ Sangat cocok dengan kriteria Anda (Gabungan 2 petani).";
+							})(),
+							productSubtotal,
+							logisticsCost,
+							fulfilledQuantityKg: orderQuantityKg,
+							shortageQuantityKg: 0,
+							allocations: [
+								{
+									candidate: c1,
+									allocatedQuantityKg: alloc1,
+									pricePerKg: c1.batch.pricePerKg,
+									productSubtotal: subtotal1,
+									logisticsCost: c1.route.estimatedCost
+								},
+								{
+									candidate: c2,
+									allocatedQuantityKg: alloc2,
+									pricePerKg: c2.batch.pricePerKg,
+									productSubtotal: subtotal2,
+									logisticsCost: c2.route.estimatedCost
+								}
+							]
+						});
 					}
 				}
 			}
-			options.push(...splitOptions);
 		}
+		options.push(...splitOptions);
 
 		// 6. Sort and Limit Options
 		// Ranking: totalScore desc, grandTotal asc, distance asc, aggregateQuality desc, availableDate asc (implicitly handled if scores equal)
@@ -219,7 +242,18 @@ export const MatchingService = {
 			return b.aggregateQuality - a.aggregateQuality;
 		});
 
-		const topOptions = options.slice(0, 5); // Limit to top 5 combinations
+		// Filter for diversity: ensure unique combinations of farmers
+		const uniqueOptions = [];
+		const seenCombinations = new Set();
+		for (const opt of options) {
+			const farmerIds = opt.allocations.map((/** @type {any} */ a) => a.candidate.farmer.id).sort().join(',');
+			if (!seenCombinations.has(farmerIds)) {
+				seenCombinations.add(farmerIds);
+				uniqueOptions.push(opt);
+			}
+		}
+
+		const topOptions = uniqueOptions.slice(0, 5); // Limit to top 5 combinations
 
 		// If no options, it's a shortage
 		if (topOptions.length === 0) {
@@ -330,45 +364,51 @@ export const MatchingService = {
 		});
 
 		// Map to API response structure
-		const results = savedOptions.map((/** @type {any} */ opt) => ({
-			optionId: opt.id,
-			type: opt.type.toLowerCase(),
-			rank: opt.rank,
-			fulfilledQuantityKg: Number(opt.fulfilledQuantityKg),
-			shortageQuantityKg: Number(opt.shortageQuantityKg),
-			productSubtotal: opt.productSubtotal,
-			logisticsCost: opt.logisticsCost,
-			grandTotal: opt.grandTotal,
-			score: {
-				total: Number(opt.totalScore),
-				aggregateQuality: Number(opt.aggregateQualityScore),
-				aggregateReputation: Number(opt.aggregateReputationScore),
-				aggregateLogistics: Number(opt.aggregateLogisticsScore)
-			},
-			allocations: opt.allocations.map((/** @type {any} */ a) => ({
-				allocationId: a.id,
-				batchId: a.batchId,
-				farmer: {
-					id: a.batch.farmer.id,
-					name: a.batch.farmer.farmName,
-					reputationScore: Number(a.batch.farmer.reputationScore)
+		const results = savedOptions.map((/** @type {any} */ opt, index) => {
+			// Find the corresponding original option (since they are both sorted by rank, index usually matches, but we can search by rank to be safe)
+			const originalOpt = topOptions.find((o, idx) => idx === index);
+
+			return {
+				optionId: opt.id,
+				type: opt.type.toLowerCase(),
+				rank: opt.rank,
+				fulfilledQuantityKg: Number(opt.fulfilledQuantityKg),
+				shortageQuantityKg: Number(opt.shortageQuantityKg),
+				productSubtotal: opt.productSubtotal,
+				logisticsCost: opt.logisticsCost,
+				grandTotal: opt.grandTotal,
+				penjelasan_nlp: originalOpt ? originalOpt.penjelasan_nlp : null,
+				score: {
+					total: Number(opt.totalScore),
+					aggregateQuality: Number(opt.aggregateQualityScore),
+					aggregateReputation: Number(opt.aggregateReputationScore),
+					aggregateLogistics: Number(opt.aggregateLogisticsScore)
 				},
-				allocatedQuantityKg: Number(a.allocatedQuantityKg),
-				pricePerKg: a.pricePerKg,
-				productSubtotal: a.productSubtotal,
-				logistics: {
-					distanceKm: Number(a.distanceKm),
-					durationMinutes: a.durationMinutes,
-					logisticsCost: a.logisticsCost,
-					routeSource: a.routeSource,
-					geometry: a.routeGeometry
-				},
-				certificate: a.batch.certificate ? {
-					certificateCode: a.batch.certificate.certificateCode,
-					verifyUrl: a.batch.certificate.verifyUrl
-				} : null
-			}))
-		}));
+				allocations: opt.allocations.map((/** @type {any} */ a) => ({
+					allocationId: a.id,
+					batchId: a.batchId,
+					farmer: {
+						id: a.batch.farmer.id,
+						name: a.batch.farmer.farmName,
+						reputationScore: Number(a.batch.farmer.reputationScore)
+					},
+					allocatedQuantityKg: Number(a.allocatedQuantityKg),
+					pricePerKg: a.pricePerKg,
+					productSubtotal: a.productSubtotal,
+					logistics: {
+						distanceKm: Number(a.distanceKm),
+						durationMinutes: a.durationMinutes,
+						logisticsCost: a.logisticsCost,
+						routeSource: a.routeSource,
+						geometry: a.routeGeometry
+					},
+					certificate: a.batch.certificate ? {
+						certificateCode: a.batch.certificate.certificateCode,
+						verifyUrl: a.batch.certificate.verifyUrl
+					} : null
+				}))
+			};
+		});
 
 		// If shortage, return a shortage response instead of empty array?
 		// "lebih dari dua supplier dibutuhkan → kembalikan shortage"

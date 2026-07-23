@@ -22,7 +22,7 @@ export async function load({ parent }) {
 		return { harvests: [] };
 	}
 
-	const harvests = farmer.harvestBatches.map(batch => ({
+	const harvests = farmer.harvestBatches.map(/** @param {any} batch */ (batch) => ({
 		id: batch.id.split('-')[0].toUpperCase(),
 		date: batch.createdAt.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
 		quality: Number(batch.qualityScore) || 0,
