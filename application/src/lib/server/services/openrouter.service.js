@@ -23,9 +23,11 @@ export async function fetchIntentFromOpenRouter(text, currentDate) {
 	try {
 		const systemPrompt = `Anda adalah extractor intent pembelian tomat untuk Taniva.
 Kembalikan hanya data yang sesuai JSON Schema.
-MVP hanya mendukung commodity "tomato".
+MVP hanya mendukung commodity "tomato". Jika komoditas lain diminta, set status "needs_clarification" dan tanya ulang.
 Jangan membuat informasi yang tidak disebutkan atau tidak dapat diturunkan secara aman.
-quantityKg harus dalam kilogram.
+Jika informasi lengkap (commodity, quantityKg, minimumQuality, neededDate), set status "complete" dan isi object "intent".
+Jika ada informasi yang kurang, set status "needs_clarification", isi object "partialIntent" dengan data yang ada, sebutkan field yang kurang di "missingFields", dan beri pertanyaan dalam "clarificationQuestion".
+quantityKg harus dalam kilogram. Gram dan ton boleh dinormalisasi ke kilogram.
 minimumQuality berada pada skala 0–100.
 Gunakan tanggal bisnis Asia/Jakarta.
 Gunakan currentDate yang diberikan untuk memahami "hari ini", "besok", dan tanggal relatif.
@@ -35,8 +37,8 @@ currentDate: ${currentDate}
 
 Mapping kualitas MVP yang boleh digunakan hanya ketika kata kualitas memang muncul:
 bagus / segar / tinggi  -> 80
-sedang                  -> 50
-rendah                  -> 0`;
+sedang / campur         -> 50
+rendah / tidak mensyaratkan kualitas -> 0`;
 
 		const response = await fetch(`${config.OPENROUTER_BASE_URL}/chat/completions`, {
 			method: 'POST',
@@ -53,7 +55,7 @@ rendah                  -> 0`;
 					{ role: 'user', content: text }
 				],
 				temperature: 0,
-				max_tokens: 300,
+				max_tokens: 500,
 				stream: false,
 				response_format: {
 					type: 'json_schema',
@@ -64,25 +66,41 @@ rendah                  -> 0`;
 							type: 'object',
 							additionalProperties: false,
 							properties: {
-								commodity: {
+								status: {
 									type: 'string',
-									enum: ['tomato']
+									enum: ['complete', 'needs_clarification']
 								},
-								quantityKg: {
-									type: 'number',
-									exclusiveMinimum: 0
+								intent: {
+									type: ['object', 'null'],
+									additionalProperties: false,
+									properties: {
+										commodity: { type: 'string', enum: ['tomato'] },
+										quantityKg: { type: 'number', exclusiveMinimum: 0 },
+										minimumQuality: { type: 'number', minimum: 0, maximum: 100 },
+										neededDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' }
+									},
+									required: ['commodity', 'quantityKg', 'minimumQuality', 'neededDate']
 								},
-								minimumQuality: {
-									type: 'number',
-									minimum: 0,
-									maximum: 100
+								partialIntent: {
+									type: ['object', 'null'],
+									additionalProperties: false,
+									properties: {
+										commodity: { type: ['string', 'null'], enum: ['tomato'] },
+										quantityKg: { type: ['number', 'null'], exclusiveMinimum: 0 },
+										minimumQuality: { type: ['number', 'null'], minimum: 0, maximum: 100 },
+										neededDate: { type: ['string', 'null'], pattern: '^\\d{4}-\\d{2}-\\d{2}$' }
+									},
+									required: ['commodity', 'quantityKg', 'minimumQuality', 'neededDate']
 								},
-								neededDate: {
-									type: 'string',
-									pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+								missingFields: {
+									type: 'array',
+									items: { type: 'string' }
+								},
+								clarificationQuestion: {
+									type: ['string', 'null']
 								}
 							},
-							required: ['commodity', 'quantityKg', 'minimumQuality', 'neededDate']
+							required: ['status', 'intent', 'partialIntent', 'missingFields', 'clarificationQuestion']
 						}
 					}
 				},
