@@ -1,75 +1,72 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/server/db/prisma.js';
+import bcrypt from 'bcryptjs';
 
 async function main() {
-	// Clean up existing data
-	await prisma.activityLog.deleteMany();
-	await prisma.user.deleteMany();
+	console.log('Seeding database...');
+	
+	const defaultPasswordHash = await bcrypt.hash('password', 10);
 
-	// 1. Create Users (Admin, Farmer, UMKM)
-	const admin = await prisma.user.create({
-		data: {
+	// 1. Admin User
+	const adminUser = await prisma.user.upsert({
+		where: { email: 'admin@taniva.com' },
+		update: { passwordHash: defaultPasswordHash },
+		create: {
 			name: 'Administrator',
-			email: 'admin@taniva.id',
-			passwordHash: 'admin', // Simple for demo
+			email: 'admin@taniva.com',
+			passwordHash: defaultPasswordHash,
 			role: 'ADMIN',
-		}
+		},
 	});
+	console.log('Created admin user:', adminUser.email);
 
-	const petani1 = await prisma.user.create({
-		data: {
-			name: 'Budi Santoso',
-			email: 'petani1@taniva.id',
-			passwordHash: 'petani1',
+	// 2. Farmer User
+	const farmerUser = await prisma.user.upsert({
+		where: { email: 'farmer@taniva.com' },
+		update: { passwordHash: defaultPasswordHash },
+		create: {
+			name: 'Petani',
+			email: 'farmer@taniva.com',
+			passwordHash: defaultPasswordHash,
 			role: 'FARMER',
 			farmer: {
 				create: {
-					farmName: 'Kebun Berkah',
-					address: 'Jl. Merdeka No.1, Solo',
+					farmName: 'Kebun Makmur',
+					address: 'Jl. Slamet Riyadi No. 1, Surakarta',
 					latitude: -7.5666,
 					longitude: 110.8283,
-					reputationScore: 85
 				}
 			}
-		}
+		},
 	});
+	console.log('Created farmer user:', farmerUser.email);
 
-	const umkm1 = await prisma.user.create({
-		data: {
-			name: 'Siti Rahma',
-			email: 'umkm1@taniva.id',
-			passwordHash: 'umkm1',
+	// 3. UMKM User
+	const umkmUser = await prisma.user.upsert({
+		where: { email: 'umkm@taniva.com' },
+		update: { passwordHash: defaultPasswordHash },
+		create: {
+			name: 'UMKM',
+			email: 'umkm@taniva.com',
+			passwordHash: defaultPasswordHash,
 			role: 'UMKM',
 			umkm: {
 				create: {
-					businessName: 'Sambal Bu Siti',
-					address: 'Jl. Slamet Riyadi, Solo',
-					latitude: -7.5750,
-					longitude: 110.8250
+					businessName: 'Kripik Jaya',
+					address: 'Jl. Jend. Sudirman No. 2, Surakarta',
+					latitude: -7.5755,
+					longitude: 110.8243,
 				}
 			}
-		}
+		},
 	});
-
-	// 2. Create Initial Activity Logs
-	await prisma.activityLog.createMany({
-		data: [
-			{ userId: admin.id, action: 'Sistem diinisialisasi', details: { module: 'System' } },
-			{ userId: petani1.id, action: 'Registrasi Petani baru', details: { farmName: 'Kebun Berkah' } },
-			{ userId: umkm1.id, action: 'Registrasi UMKM baru', details: { businessName: 'Sambal Bu Siti' } },
-			{ userId: petani1.id, action: 'Upload panen tomat', details: { quantity: 50 } },
-			{ userId: umkm1.id, action: 'Membuat permintaan tomat', details: { quantity: 30 } }
-		]
-	});
-
-	console.log('Database seeded successfully!');
-	console.log(`Created users: admin (${admin.id}), petani1 (${petani1.id}), umkm1 (${umkm1.id})`);
+	console.log('Created UMKM user:', umkmUser.email);
+	
+	console.log('Seeding complete!');
 }
 
 main()
 	.catch((e) => {
-		console.error(e);
+		console.error('Seed Error:', e);
 		process.exit(1);
 	})
 	.finally(async () => {

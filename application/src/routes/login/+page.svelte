@@ -1,15 +1,25 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
 	
 	let { form } = $props();
-	
-	let authMode = $state('login');
+
+	let authMode = $state('login'); // 'login' | 'register'
+	let name = $state(String(form?.name || ''));
+	let email = $state(String(form?.email || ''));
+	let password = $state('');
 	let isAuthenticating = $state(false);
-	let selectedRole = $state('FARMER');
+
+	onMount(() => {
+		// Seeding is now handled by Prisma (prisma/seed.js)
+	});
 
 	/** @param {'login' | 'register'} mode */
 	function toggleMode(mode) {
 		authMode = mode;
+		name = '';
+		email = '';
+		password = '';
 	}
 </script>
 
@@ -44,8 +54,8 @@
 			<form class="auth-form" method="POST" action="?/{authMode}" use:enhance={() => {
 				isAuthenticating = true;
 				return async ({ update }) => {
-					isAuthenticating = false;
 					await update();
+					isAuthenticating = false;
 				};
 			}}>
 				{#if form?.error}
@@ -55,50 +65,30 @@
 					</div>
 				{/if}
 
-				<div class="input-container">
-					<input type="text" id="username" name="username" required placeholder=" " />
-					<label for="username">{authMode === 'login' ? 'Username / No. HP / Email' : 'Nama Lengkap'}</label>
-					<div class="input-line"></div>
-				</div>
-
 				{#if authMode === 'register'}
-					<div class="input-container">
-						<input type="email" id="email" name="email" required placeholder=" " />
-						<label for="email">Email</label>
+					<div class="input-container animate-expand">
+						<input type="text" id="name" name="name" bind:value={name} required={authMode === 'register'} placeholder=" " />
+						<label for="name">Nama Lengkap</label>
 						<div class="input-line"></div>
-					</div>
-					<div class="role-selector animate-expand">
-						<div class="role-label" style="margin-bottom:0.75rem; color:var(--color-on-surface-variant); font-size:0.875rem;">Daftar Sebagai</div>
-						<div class="role-grid" style="grid-template-columns: 1fr 1fr;">
-							<label class="role-card {selectedRole === 'FARMER' ? 'selected' : ''}">
-								<input type="radio" name="role" value="FARMER" bind:group={selectedRole} required>
-								<div class="role-icon">🧑‍🌾</div>
-								<div class="role-text">
-									<span class="role-title">Petani</span>
-									<span class="role-desc">Jual hasil panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-							<label class="role-card {selectedRole === 'UMKM' ? 'selected' : ''}">
-								<input type="radio" name="role" value="UMKM" bind:group={selectedRole} required>
-								<div class="role-icon">🍽️</div>
-								<div class="role-text">
-									<span class="role-title">UMKM</span>
-									<span class="role-desc">Beli bahan baku</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-						</div>
 					</div>
 				{/if}
 
 				<div class="input-container">
-					<input type="password" id="password" name="password" required placeholder=" " />
+					<input type="email" id="email" name="email" bind:value={email} required placeholder=" " />
+					<label for="email">Email</label>
+					<div class="input-line"></div>
+				</div>
+
+				<div class="input-container">
+					<input type="password" id="password" name="password" bind:value={password} required placeholder=" " />
 					<label for="password">Kata Sandi</label>
 					<div class="input-line"></div>
 				</div>
 
-				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating}>
+
+
+
+				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || email.trim().length < 5 || password.length < 3}>
 					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
 					{#if isAuthenticating}
 						<div class="spinner"></div>

@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client-js"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
 }
 
 datasource db {
@@ -50,23 +52,22 @@ enum QualityLabel {
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id           String        @id @default(uuid()) @db.Char(36)
-  name         String        @db.VarChar(120)
-  email        String?       @unique @db.VarChar(255)
-  passwordHash String?       @map("password_hash")
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(120)
+  email        String?  @unique @db.VarChar(255)
+  passwordHash String?  @map("password_hash")
   role         UserRole
   farmer       Farmer?
   umkm         Umkm?
-  activityLogs ActivityLog[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Farmer {
-  id              String         @id @default(uuid()) @db.Char(36)
-  userId          String         @unique @map("user_id") @db.Char(36)
+  id              String         @id @default(uuid())
+  userId          String         @unique @map("user_id")
   farmName        String         @map("farm_name") @db.VarChar(160)
   address         String
   latitude        Float
@@ -83,8 +84,8 @@ model Farmer {
 }
 
 model Umkm {
-  id           String   @id @default(uuid()) @db.Char(36)
-  userId       String   @unique @map("user_id") @db.Char(36)
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
   businessName String   @map("business_name") @db.VarChar(160)
   address      String
   latitude     Float
@@ -99,38 +100,40 @@ model Umkm {
 }
 
 model HarvestBatch {
-  id                String          @id @default(uuid()) @db.Char(36)
-  farmerId          String          @map("farmer_id") @db.Char(36)
-  commodity         String          @db.VarChar(40)
-  quantityKg        Decimal         @map("quantity_kg") @db.Decimal(10, 2)
-  pricePerKg        Int             @map("price_per_kg")
-  availableDate     DateTime        @map("available_date") @db.Date
-  originalImageUrl  String          @map("original_image_url")
-  annotatedImageUrl String?         @map("annotated_image_url")
-  qualityScore      Decimal?        @map("quality_score") @db.Decimal(5, 2)
-  qualityLabel      QualityLabel?   @map("quality_label")
-  freshCount        Int?            @map("fresh_count")
-  rottenCount       Int?            @map("rotten_count")
-  totalDetected     Int?            @map("total_detected")
-  aiResultJson      Json?           @map("ai_result_json") @db.Json
-  aiSource          String?         @map("ai_source") @db.VarChar(40)
-  status            HarvestStatus   @default(DRAFT)
-  farmer            Farmer          @relation(fields: [farmerId], references: [id], onDelete: Restrict)
-  certificate       Certificate?
-  matchResults      MatchResult[]
-  selectedOrders    Order[]         @relation("SelectedBatch")
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt         DateTime        @updatedAt @map("updated_at")
+  id                  String                  @id @default(uuid())
+  farmerId            String                  @map("farmer_id")
+  commodity           String                  @db.VarChar(40)
+  quantityKg          Decimal                 @map("quantity_kg") @db.Decimal(10, 2)
+  remainingQuantityKg Decimal                 @map("remaining_quantity_kg") @db.Decimal(10, 2)
+  pricePerKg          Int                     @map("price_per_kg")
+  availableDate       DateTime                @map("available_date") @db.Date
+  originalImageUrl    String                  @map("original_image_url")
+  annotatedImageUrl   String?                 @map("annotated_image_url")
+  qualityScore        Decimal?                @map("quality_score") @db.Decimal(5, 2)
+  qualityLabel        QualityLabel?           @map("quality_label")
+  freshCount          Int?                    @map("fresh_count")
+  rottenCount         Int?                    @map("rotten_count")
+  totalDetected       Int?                    @map("total_detected")
+  aiResultJson        Json?                   @map("ai_result_json") @db.Json
+  aiSource            String?                 @map("ai_source") @db.VarChar(40)
+  status              HarvestStatus           @default(DRAFT)
+  farmer              Farmer                  @relation(fields: [farmerId], references: [id], onDelete: Restrict)
+  certificate         Certificate?
+  allocations         FulfillmentAllocation[]
+  matchResults        MatchResult[]
+  selectedOrders      Order[]                 @relation("SelectedBatch")
+  createdAt           DateTime                @default(now()) @map("created_at")
+  updatedAt           DateTime                @updatedAt @map("updated_at")
 
   @@index([farmerId])
-  @@index([status, commodity, qualityScore])
+  @@index([status, commodity, qualityScore, availableDate], map: "idx_harvest_batches_search")
   @@index([availableDate])
   @@map("harvest_batches")
 }
 
 model Certificate {
-  id              String       @id @default(uuid()) @db.Char(36)
-  batchId         String       @unique @map("batch_id") @db.Char(36)
+  id              String       @id @default(uuid())
+  batchId         String       @unique @map("batch_id")
   certificateCode String       @unique @map("certificate_code") @db.VarChar(32)
   snapshotJson    Json         @map("snapshot_json") @db.Json
   hashSha256      String       @unique @map("hash_sha256") @db.Char(64)
@@ -143,24 +146,26 @@ model Certificate {
 }
 
 model Order {
-  id              String        @id @default(uuid()) @db.Char(36)
-  umkmId          String        @map("umkm_id") @db.Char(36)
-  rawText         String        @map("raw_text") @db.Text
-  commodity       String        @db.VarChar(40)
-  quantityKg      Decimal       @map("quantity_kg") @db.Decimal(10, 2)
-  minimumQuality  Decimal       @map("minimum_quality") @db.Decimal(5, 2)
-  neededDate      DateTime      @map("needed_date") @db.Date
-  latitude        Float
-  longitude       Float
-  selectedBatchId String?       @map("selected_batch_id") @db.Char(36)
-  status          OrderStatus   @default(DRAFT)
-  nlpSource       String?       @map("nlp_source") @db.VarChar(40)
-  umkm            Umkm          @relation(fields: [umkmId], references: [id], onDelete: Restrict)
-  selectedBatch   HarvestBatch? @relation("SelectedBatch", fields: [selectedBatchId], references: [id], onDelete: SetNull)
-  matchResults    MatchResult[]
-  rating          Rating?
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  id                          String              @id @default(uuid())
+  umkmId                      String              @map("umkm_id")
+  rawText                     String              @map("raw_text")
+  commodity                   String              @db.VarChar(40)
+  quantityKg                  Decimal             @map("quantity_kg") @db.Decimal(10, 2)
+  minimumQuality              Decimal             @map("minimum_quality") @db.Decimal(5, 2)
+  neededDate                  DateTime            @map("needed_date") @db.Date
+  latitude                    Float
+  longitude                   Float
+  selectedFulfillmentOptionId String?             @map("selected_fulfillment_option_id")
+  selectedBatchId             String?             @map("selected_batch_id")
+  status                      OrderStatus         @default(DRAFT)
+  nlpSource                   String?             @map("nlp_source") @db.VarChar(40)
+  idempotencyKey              String?             @unique @map("idempotency_key") @db.VarChar(128)
+  umkm                        Umkm                @relation(fields: [umkmId], references: [id], onDelete: Restrict)
+  selectedBatch               HarvestBatch?       @relation("SelectedBatch", fields: [selectedBatchId], references: [id], onDelete: SetNull)
+  matchResults                MatchResult[]
+  fulfillmentOptions          FulfillmentOption[]
+  createdAt                   DateTime            @default(now()) @map("created_at")
+  updatedAt                   DateTime            @updatedAt @map("updated_at")
 
   @@index([umkmId, status])
   @@index([selectedBatchId])
@@ -168,9 +173,9 @@ model Order {
 }
 
 model MatchResult {
-  id                     String       @id @default(uuid()) @db.Char(36)
-  orderId                String       @map("order_id") @db.Char(36)
-  batchId                String       @map("batch_id") @db.Char(36)
+  id                     String       @id @default(uuid())
+  orderId                String       @map("order_id")
+  batchId                String       @map("batch_id")
   qualityScore           Decimal      @map("quality_score") @db.Decimal(5, 2)
   reputationScore        Decimal      @map("reputation_score") @db.Decimal(5, 2)
   logisticsScore         Decimal      @map("logistics_score") @db.Decimal(5, 2)
@@ -195,33 +200,77 @@ model MatchResult {
 }
 
 model Rating {
-  id                 String   @id @default(uuid()) @db.Char(36)
-  orderId            String   @unique @map("order_id") @db.Char(36)
-  farmerId           String   @map("farmer_id") @db.Char(36)
-  umkmId             String   @map("umkm_id") @db.Char(36)
+  id                 String                @id @default(uuid())
+  allocationId       String                @unique @map("allocation_id")
+  farmerId           String                @map("farmer_id")
+  umkmId             String                @map("umkm_id")
   score              Int
-  comment            String?  @db.Text
-  oldReputationScore Decimal  @map("old_reputation_score") @db.Decimal(5, 2)
-  newReputationScore Decimal  @map("new_reputation_score") @db.Decimal(5, 2)
-  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  farmer             Farmer   @relation(fields: [farmerId], references: [id], onDelete: Restrict)
-  umkm               Umkm     @relation(fields: [umkmId], references: [id], onDelete: Restrict)
-  createdAt          DateTime @default(now()) @map("created_at")
+  comment            String?
+  oldReputationScore Decimal               @map("old_reputation_score") @db.Decimal(5, 2)
+  newReputationScore Decimal               @map("new_reputation_score") @db.Decimal(5, 2)
+  allocation         FulfillmentAllocation @relation(fields: [allocationId], references: [id], onDelete: Cascade)
+  farmer             Farmer                @relation(fields: [farmerId], references: [id], onDelete: Restrict)
+  umkm               Umkm                  @relation(fields: [umkmId], references: [id], onDelete: Restrict)
+  createdAt          DateTime              @default(now()) @map("created_at")
 
   @@index([farmerId])
   @@index([umkmId])
   @@map("ratings")
 }
 
-model ActivityLog {
-  id        String   @id @default(uuid()) @db.Char(36)
-  userId    String   @map("user_id") @db.Char(36)
-  action    String
-  details   Json?
-  createdAt DateTime @default(now()) @map("created_at")
+enum FulfillmentType {
+  SINGLE @map("single")
+  SPLIT  @map("split")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("fulfillment_type")
+}
 
-  @@index([userId])
-  @@map("activity_logs")
+model FulfillmentOption {
+  id                       String                  @id @default(uuid())
+  orderId                  String                  @map("order_id")
+  type                     FulfillmentType         @default(SINGLE)
+  rank                     Int
+  fulfilledQuantityKg      Decimal                 @map("fulfilled_quantity_kg") @db.Decimal(10, 2)
+  shortageQuantityKg       Decimal                 @map("shortage_quantity_kg") @db.Decimal(10, 2)
+  productSubtotal          Int                     @map("product_subtotal")
+  logisticsCost            Int                     @map("logistics_cost")
+  grandTotal               Int                     @map("grand_total")
+  aggregateQualityScore    Decimal                 @map("aggregate_quality_score") @db.Decimal(5, 2)
+  aggregateReputationScore Decimal                 @map("aggregate_reputation_score") @db.Decimal(5, 2)
+  aggregateLogisticsScore  Decimal                 @map("aggregate_logistics_score") @db.Decimal(5, 2)
+  totalScore               Decimal                 @map("total_score") @db.Decimal(6, 3)
+  status                   String                  @db.VarChar(40)
+  order                    Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  allocations              FulfillmentAllocation[]
+  createdAt                DateTime                @default(now()) @map("created_at")
+
+  @@unique([orderId, rank])
+  @@index([orderId, rank])
+  @@map("fulfillment_options")
+}
+
+model FulfillmentAllocation {
+  id                  String            @id @default(uuid())
+  optionId            String            @map("option_id")
+  batchId             String            @map("batch_id")
+  allocatedQuantityKg Decimal           @map("allocated_quantity_kg") @db.Decimal(10, 2)
+  pricePerKg          Int               @map("price_per_kg")
+  productSubtotal     Int               @map("product_subtotal")
+  distanceKm          Decimal           @map("distance_km") @db.Decimal(10, 2)
+  durationMinutes     Int?              @map("duration_minutes")
+  logisticsCost       Int               @map("logistics_cost")
+  routeSource         String            @map("route_source") @db.VarChar(40)
+  routeGeometry       Json?             @map("route_geometry") @db.Json
+  qualityScore        Decimal           @map("quality_score") @db.Decimal(5, 2)
+  reputationScore     Decimal           @map("reputation_score") @db.Decimal(5, 2)
+  status              String            @default("PENDING") @db.VarChar(40)
+  sequence            Int               @default(1)
+  option              FulfillmentOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  batch               HarvestBatch      @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  rating              Rating?
+
+  @@unique([optionId, batchId])
+  @@index([optionId, sequence])
+  @@index([batchId])
+  @@map("fulfillment_allocations")
 }
