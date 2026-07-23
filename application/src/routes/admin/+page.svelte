@@ -46,21 +46,22 @@
 </script>
 
 <div class="dashboard-layout">
-	<!-- Hero Header -->
-	<header class="dashboard-hero admin-hero">
-		<div class="mesh-bg"></div>
-		<div class="hero-content">
-			<div class="hero-text animate-slide-up">
+	<!-- Flat Header -->
+	<header class="admin-header">
+		<div class="header-content">
+			<div class="header-text animate-slide-up">
 				<h1 class="page-title">Dashboard {data.user?.name || 'Admin'}</h1>
 				<p class="page-subtitle">Pantau seluruh aktivitas ekosistem Taniva secara real-time.</p>
-				<a href="/admin/impact" class="impact-link-btn">Lihat Smart Impact Dashboard →</a>
 			</div>
-			<div class="clock-badge animate-slide-up" style="animation-delay: 100ms;">
-				<div class="clock-icon">🕐</div>
-				<div class="clock-text">
-					<span class="clock-time">{now.toLocaleTimeString('id-ID')}</span>
-					<span class="clock-date">{now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+			<div class="header-actions animate-slide-up" style="animation-delay: 100ms;">
+				<div class="clock-badge flat-panel">
+					<div class="clock-icon">🕐</div>
+					<div class="clock-text">
+						<span class="clock-time">{now.toLocaleTimeString('id-ID')}</span>
+						<span class="clock-date">{now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+					</div>
 				</div>
+				<a href="/admin/impact" class="impact-link-btn">Smart Impact →</a>
 			</div>
 		</div>
 	</header>
@@ -69,21 +70,21 @@
 		<div class="content-wrapper">
 			<!-- Stats Overview -->
 			<section class="stats-overview animate-fade-in-up" style="animation-delay: 200ms;">
-				<div class="stat-card glass-card">
+				<div class="stat-card">
 					<div class="stat-icon icon-users">👥</div>
 					<div class="stat-info">
 						<div class="stat-label">Pengguna Terdaftar</div>
 						<div class="stat-value">{registeredUsers.length}</div>
 					</div>
 				</div>
-				<div class="stat-card glass-card">
+				<div class="stat-card">
 					<div class="stat-icon icon-today">📊</div>
 					<div class="stat-info">
 						<div class="stat-label">Aktivitas Hari Ini</div>
 						<div class="stat-value">{summary.todayActivities}</div>
 					</div>
 				</div>
-				<div class="stat-card glass-card">
+				<div class="stat-card">
 					<div class="stat-icon icon-total">🔢</div>
 					<div class="stat-info">
 						<div class="stat-label">Total Log Aktivitas</div>
@@ -101,19 +102,16 @@
 							<h2 class="section-title">Distribusi Aktivitas per Peran</h2>
 						</div>
 						<div class="dist-chart">
-							{#each Object.entries(summary.roleDist) as [role, count]}
+							{#each Object.entries(summary.roleDist).filter(([role]) => role !== 'admin') as [role, count]}
 								<div class="dist-row">
 									<div class="dist-label">
 										<span class="dist-icon">{roleIcon(role)}</span>
 										<span class="dist-role">{role.charAt(0).toUpperCase() + role.slice(1)}</span>
 									</div>
-									<div class="dist-bar-track">
-										<div class="dist-bar-fill dist-bar-{role}" style="width: {(count / totalAll) * 100}%;"></div>
-									</div>
 									<span class="dist-count">{count}</span>
 								</div>
 							{/each}
-							{#if Object.keys(summary.roleDist).length === 0}
+							{#if Object.keys(summary.roleDist).filter(r => r !== 'admin').length === 0}
 								<p class="empty-text">Belum ada data aktivitas.</p>
 							{/if}
 						</div>
@@ -180,98 +178,68 @@
 <style>
 	.dashboard-layout {
 		min-height: 100dvh;
-		background: #faf9f5;
+		background: #f8fafc;
 		font-family: var(--font-sans, system-ui, sans-serif);
 		padding-bottom: 4rem;
+		color: var(--color-ink);
 	}
 
-	/* Admin Hero - uses a distinct indigo-dark palette */
-	.admin-hero {
-		position: relative;
-		background: #0f172a;
-		padding: 3rem 1.5rem 6rem;
-		overflow: hidden;
-		color: #ffffff;
+	/* Flat Header */
+	.admin-header {
+		background: #ffffff;
+		padding: 2.5rem 1.5rem;
+		border-bottom: 1px solid #e2e8f0;
 	}
 
-	.mesh-bg {
-		position: absolute;
-		inset: -50%;
-		background: 
-			radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.6) 0%, transparent 50%),
-			radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.5) 0%, transparent 50%),
-			radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.4) 0%, transparent 50%);
-		filter: blur(60px);
-		animation: pulseBg 15s ease-in-out infinite alternate;
-		z-index: 0;
-	}
-
-	@keyframes pulseBg {
-		0% { transform: scale(1) translate(0, 0); }
-		100% { transform: scale(1.1) translate(-2%, 2%); }
-	}
-
-	.hero-content {
-		position: relative;
-		z-index: 1;
+	.header-content {
 		max-width: 64rem;
 		margin: 0 auto;
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;
+		align-items: flex-end;
 		flex-wrap: wrap;
 		gap: 1.5rem;
 	}
 
-	.hero-text { max-width: 450px; }
+	.header-text { max-width: 480px; }
 
 	.page-title {
 		font-size: 2rem;
 		font-weight: 800;
-		margin: 0 0 0.5rem;
-		line-height: 1.2;
+		color: var(--color-ink);
+		margin: 0 0 0.25rem;
+		line-height: 1.1;
 		letter-spacing: -0.02em;
 	}
 
 	.page-subtitle {
 		font-size: 0.9375rem;
-		color: rgba(255, 255, 255, 0.8);
-		margin: 0 0 1.5rem;
+		color: var(--color-smoke);
+		margin: 0;
 		line-height: 1.5;
 	}
 
-	.impact-link-btn {
-		display: inline-block;
-		padding: 0.75rem 1.5rem;
-		background: rgba(255, 255, 255, 0.15);
-		color: #ffffff;
-		text-decoration: none;
-		border-radius: 100px;
-		font-weight: 600;
-		font-size: 0.875rem;
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		backdrop-filter: blur(10px);
-		transition: all 0.2s;
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
 	}
 
-	.impact-link-btn:hover {
-		background: rgba(255, 255, 255, 0.25);
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+	/* Flat Panel */
+	.flat-panel {
+		background: #f1f5f9;
+		border: 1px solid #e2e8f0;
 	}
 
 	.clock-badge {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 0.75rem 1.25rem;
-		border-radius: 16px;
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
 	}
 
-	.clock-icon { font-size: 1.5rem; }
+	.clock-icon { font-size: 1.25rem; }
 
 	.clock-text {
 		display: flex;
@@ -279,36 +247,52 @@
 	}
 
 	.clock-time {
-		font-size: 1.125rem;
+		font-size: 0.875rem;
 		font-weight: 800;
+		color: var(--color-ink);
 		font-variant-numeric: tabular-nums;
+		line-height: 1.2;
 	}
 
 	.clock-date {
-		font-size: 0.6875rem;
-		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.625rem;
+		color: var(--color-smoke);
 		font-weight: 600;
+	}
+
+	.impact-link-btn {
+		display: inline-block;
+		padding: 0.625rem 1.25rem;
+		background: #1b5e20;
+		color: #ffffff;
+		text-decoration: none;
+		border-radius: 8px;
+		font-weight: 700;
+		font-size: 0.875rem;
+		transition: background 0.2s;
+	}
+
+	.impact-link-btn:hover {
+		background: #144517;
 	}
 
 	/* Main Content */
 	.dashboard-main {
 		max-width: 64rem;
 		margin: 0 auto;
-		padding: 0 1.5rem;
+		padding: 2rem 1.5rem;
 	}
 
 	.content-wrapper {
-		margin-top: -3rem;
 		position: relative;
-		z-index: 10;
 	}
 
-	/* Stats */
+	/* Flat Cards */
 	.stats-overview {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 1rem;
-		margin-bottom: 2rem;
+		gap: 1.5rem;
+		margin-bottom: 2.5rem;
 	}
 
 	@media (min-width: 640px) {
@@ -320,18 +304,16 @@
 	.stat-card {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: 1.25rem;
 		background: #ffffff;
-		padding: 1.25rem;
-		border-radius: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-		border: 1px solid #f3f4f6;
-		transition: transform 0.2s, box-shadow 0.2s;
+		padding: 1.5rem;
+		border-radius: 12px;
+		border: 1px solid #e2e8f0;
+		transition: border-color 0.2s;
 	}
 
 	.stat-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 12px 40px rgba(99, 102, 241, 0.1);
+		border-color: #cbd5e1;
 	}
 
 	.stat-icon {
@@ -340,28 +322,29 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 12px;
-		font-size: 1.25rem;
+		border-radius: 8px;
+		font-size: 1.5rem;
+		background: #f1f5f9;
+		border: 1px solid #e2e8f0;
 	}
-
-	.icon-users { background: #ede9fe; }
-	.icon-today { background: #dbeafe; }
-	.icon-total { background: #fce7f3; }
 
 	.stat-info { flex: 1; }
 
 	.stat-label {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: #6b7280;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-smoke);
 		margin-bottom: 0.25rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.stat-value {
-		font-size: 1.5rem;
+		font-size: 2rem;
 		font-weight: 800;
-		color: #111827;
+		color: var(--color-ink);
 		line-height: 1;
+		letter-spacing: -0.02em;
 	}
 
 	/* Main Grid */
@@ -379,93 +362,77 @@
 
 	.section-card {
 		background: #ffffff;
-		border-radius: 20px;
-		padding: 1.5rem;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-		border: 1px solid #f3f4f6;
-		margin-bottom: 1.5rem;
+		border-radius: 12px;
+		padding: 2rem;
+		border: 1px solid #e2e8f0;
+		margin-bottom: 2rem;
 	}
 
 	.section-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 1.25rem;
+		margin-bottom: 1.5rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid #e2e8f0;
 	}
 
 	.section-title {
 		font-size: 1.125rem;
-		font-weight: 700;
-		color: #111827;
+		font-weight: 800;
+		color: var(--color-ink);
 		margin: 0;
 	}
 
 	.user-count-badge {
 		font-size: 0.75rem;
 		font-weight: 700;
-		background: #ede9fe;
-		color: #6366f1;
+		background: #f1f5f9;
+		color: var(--color-carbon);
 		padding: 0.25rem 0.75rem;
-		border-radius: 100px;
+		border-radius: 6px;
+		border: 1px solid #e2e8f0;
 	}
 
-	/* Distribution Chart */
+	/* Distribution List - Number Only */
 	.dist-chart {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0;
 	}
 
 	.dist-row {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		justify-content: space-between;
+		padding: 1rem 0;
+		border-bottom: 1px solid #f1f5f9;
+	}
+	.dist-row:last-child {
+		border-bottom: none;
 	}
 
 	.dist-label {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		width: 5rem;
-		flex-shrink: 0;
+		gap: 0.75rem;
 	}
 
 	.dist-icon { font-size: 1.25rem; }
 
 	.dist-role {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #374151;
+		font-size: 0.9375rem;
+		font-weight: 700;
+		color: var(--color-ink);
 	}
-
-	.dist-bar-track {
-		flex: 1;
-		height: 1.5rem;
-		background: #f3f4f6;
-		border-radius: 100px;
-		overflow: hidden;
-	}
-
-	.dist-bar-fill {
-		height: 100%;
-		border-radius: 100px;
-		transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-		min-width: 1rem;
-	}
-
-	.dist-bar-petani { background: linear-gradient(90deg, #22c55e, #16a34a); }
-	.dist-bar-umkm { background: linear-gradient(90deg, #f59e0b, #d97706); }
-	.dist-bar-admin { background: linear-gradient(90deg, #6366f1, #4f46e5); }
 
 	.dist-count {
-		font-size: 0.875rem;
+		font-size: 1.25rem;
 		font-weight: 800;
-		color: #111827;
-		min-width: 2rem;
-		text-align: right;
+		color: var(--color-ink);
 	}
 
-	/* Users Table */
+	/* Users Table - Flat */
 	.users-table {
 		display: flex;
 		flex-direction: column;
@@ -474,66 +441,91 @@
 	.table-header-row {
 		display: flex;
 		justify-content: space-between;
-		padding: 0.5rem 0.75rem;
+		padding: 0.5rem 0;
 		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		color: #9ca3af;
+		color: var(--color-smoke);
 		letter-spacing: 0.05em;
-		border-bottom: 1px solid #f3f4f6;
+		border-bottom: 2px solid #e2e8f0;
+		margin-bottom: 0.5rem;
 	}
 
 	.table-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.75rem;
-		border-radius: 10px;
-		transition: background 0.2s;
+		padding: 0.875rem 0;
+		border-bottom: 1px solid #f1f5f9;
+	}
+	.table-row:last-child {
+		border-bottom: none;
 	}
 
-	.table-row:hover { background: #f9fafb; }
-
 	.table-username {
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: #111827;
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-ink);
 	}
 
 	.table-role-badge {
 		font-size: 0.6875rem;
 		font-weight: 700;
-		padding: 0.25rem 0.75rem;
-		border-radius: 100px;
+		padding: 0.25rem 0.625rem;
+		border-radius: 6px;
 		text-transform: capitalize;
 	}
 
-	/* Timeline */
+	/* Timeline - Solid */
 	.timeline {
 		display: flex;
 		flex-direction: column;
 		gap: 0;
 		max-height: 500px;
 		overflow-y: auto;
+		padding-right: 1rem;
+	}
+	
+	.timeline::-webkit-scrollbar { width: 4px; }
+	.timeline::-webkit-scrollbar-track { background: transparent; }
+	.timeline::-webkit-scrollbar-thumb {
+		background: #cbd5e1;
+		border-radius: 4px;
 	}
 
 	.timeline-item {
 		display: flex;
-		gap: 1rem;
-		padding: 1rem 0;
-		border-bottom: 1px solid #f3f4f6;
-		animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		gap: 1.25rem;
+		padding: 1.25rem 0;
+		border-bottom: 1px solid #f1f5f9;
+		animation: slideUp 0.3s ease-out forwards;
 		opacity: 0;
+		position: relative;
 	}
 
+	.timeline-item::before {
+		content: '';
+		position: absolute;
+		left: 5px; /* center of 10px dot */
+		top: 2.75rem;
+		bottom: 0;
+		width: 2px;
+		background: #e2e8f0;
+		z-index: 0;
+	}
+
+	.timeline-item:last-child::before { display: none; }
 	.timeline-item:last-child { border-bottom: none; }
 
 	.timeline-dot {
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
-		margin-top: 0.25rem;
+		margin-top: 0.35rem;
 		flex-shrink: 0;
+		position: relative;
+		z-index: 1;
+		border: 2px solid #ffffff;
 	}
 
 	.timeline-content { flex: 1; min-width: 0; }
@@ -547,74 +539,79 @@
 	}
 
 	.timeline-action {
-		font-size: 0.9375rem;
-		font-weight: 700;
-		color: #111827;
+		font-size: 0.875rem;
+		font-weight: 800;
+		color: var(--color-ink);
 	}
 
 	.timeline-time {
 		font-size: 0.6875rem;
-		color: #9ca3af;
+		color: var(--color-smoke);
 		font-weight: 600;
 		white-space: nowrap;
 	}
 
 	.timeline-detail {
-		margin: 0 0 0.5rem;
+		margin: 0 0 0.75rem;
 		font-size: 0.8125rem;
-		color: #6b7280;
-		line-height: 1.4;
+		color: var(--color-smoke);
+		line-height: 1.5;
 	}
 
 	.timeline-meta {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.75rem;
 	}
 
 	.timeline-user {
 		font-size: 0.75rem;
 		font-weight: 600;
-		color: #6b7280;
+		color: var(--color-smoke);
 	}
 
 	.timeline-role-badge {
 		font-size: 0.5625rem;
 		font-weight: 700;
-		padding: 0.125rem 0.5rem;
-		border-radius: 100px;
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 
-	/* Role Badge Colors */
+	/* Role Badge Colors - Flat Solid */
 	.badge-petani { background: #dcfce7; color: #166534; }
-	.badge-umkm { background: #fef3c7; color: #92400e; }
-	.badge-admin { background: #ede9fe; color: #4338ca; }
+	.badge-umkm { background: #e0f2fe; color: #075985; }
+	.badge-admin { background: #f1f5f9; color: #334155; }
+	
+	.timeline-dot.badge-petani { background: #22c55e; }
+	.timeline-dot.badge-umkm { background: #0ea5e9; }
+	.timeline-dot.badge-admin { background: #64748b; }
 
 	.empty-text {
-		color: #9ca3af;
+		color: var(--color-smoke);
 		font-size: 0.875rem;
+		font-weight: 500;
 		text-align: center;
 		padding: 2rem 0;
 	}
 
 	/* Animations */
 	.animate-slide-up {
-		animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: slideUp 0.4s ease-out forwards;
 		opacity: 0;
 	}
 	.animate-fade-in-up {
-		animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: fadeInUp 0.5s ease-out forwards;
 		opacity: 0;
 	}
 
 	@keyframes slideUp {
-		from { opacity: 0; transform: translateY(20px); }
+		from { opacity: 0; transform: translateY(10px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(30px); }
+		from { opacity: 0; transform: translateY(15px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 </style>
