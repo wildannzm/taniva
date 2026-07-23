@@ -2,20 +2,47 @@
 	import { onMount } from 'svelte';
 	import { userRole } from '$lib/stores/app.js';
 
+	let { data } = $props();
+
 	userRole.set('admin');
 
-	// Mock Data for Smart Impact Dashboard
-	let impactData = $state([
-		{ id: 'BATCH-2026-001', name: 'Panen Tomat Kebun Berkah', category: 'Tomat', status: 'Pending', priority: 'Tinggi', time: '10:30, Hari ini' },
-		{ id: 'LOG-2026-089', name: 'Keterlambatan Kurir Solo-Boyolali', category: 'Logistik', status: 'Pending', priority: 'Sedang', time: '09:15, Hari ini' },
-		{ id: 'BATCH-2026-002', name: 'Panen Cabai Pak Slamet', category: 'Cabai', status: 'Selesai', priority: 'Rendah', time: 'Kemarin' },
-		{ id: 'BATCH-2026-003', name: 'Panen Tomat Busuk Area X', category: 'Tomat', status: 'Pending', priority: 'Tinggi', time: 'Kemarin' },
-		{ id: 'REQ-2026-101', name: 'Kekurangan Pasokan UMKM Siti', category: 'Tomat', status: 'Selesai', priority: 'Sedang', time: '2 Hari Lalu' },
-	]);
+	// Real Data from Database
+	let impactData = $derived(data.impactData || []);
+	let metrics = $derived(data.metrics || { volumeTerdampak: 0, risikoKualitas: 0, keterlambatanLogistik: 0, umkmTerdampak: 0 });
 
 	// Filter states
 	let filterCategory = $state('Semua'); // 'Semua', 'Tomat', 'Cabai', 'Logistik'
 	let filterPriority = $state('Semua'); // 'Semua', 'Tinggi', 'Sedang', 'Rendah'
+
+	// AI State
+	let aiRecommendation = $state(null);
+	let isAnalyzing = $state(false);
+	let aiError = $state(null);
+
+	async function analyzeImpact() {
+		if (isAnalyzing) return;
+		isAnalyzing = true;
+		aiError = null;
+
+		try {
+			const res = await fetch('/api/ai/impact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ metrics, incidents: impactData })
+			});
+
+			if (!res.ok) throw new Error('Gagal terhubung ke API');
+			const result = await res.json();
+			
+			if (result.error) throw new Error(result.error);
+			aiRecommendation = result.recommendation;
+		} catch (err) {
+			console.error(err);
+			aiError = 'Gagal memuat rekomendasi AI. Silakan coba lagi.';
+		} finally {
+			isAnalyzing = false;
+		}
+	}
 
 	// Derived filtered data
 	let filteredData = $derived(
@@ -67,12 +94,23 @@
 				<div class="insight-icon">💡</div>
 				<div class="insight-content">
 					<h3 class="insight-title">Rekomendasi AI</h3>
-					<p class="insight-text">
-						Ditemukan peningkatan <strong>15%</strong> pada tomat kualitas rendah (Rotten) di rute pengiriman Boyolali. 
-						<strong>Rekomendasi Tindak Lanjut:</strong> Segera hubungi kelompok tani terkait untuk evaluasi metode pasca-panen atau alihkan pasokan logistik jalur cepat.
-					</p>
+					{#if isAnalyzing}
+						<p class="insight-text text-muted">Sedang menganalisis metrik dan log insiden...</p>
+					{:else if aiRecommendation}
+						<p class="insight-text">{aiRecommendation}</p>
+					{:else if aiError}
+						<p class="insight-text" style="color: #b91c1c;">{aiError}</p>
+					{:else}
+						<p class="insight-text text-muted">Klik tombol di samping untuk memulai analisis AI otomatis terhadap data rantai pasok saat ini.</p>
+					{/if}
 				</div>
-				<button class="action-btn-primary">Terapkan Solusi Otomatis</button>
+				{#if !aiRecommendation}
+					<button class="action-btn-primary" onclick={analyzeImpact} disabled={isAnalyzing}>
+						{isAnalyzing ? 'Menganalisis...' : 'Mulai Analisis AI'}
+					</button>
+				{:else}
+					<button class="action-btn-primary">Terapkan Solusi Otomatis</button>
+				{/if}
 			</section>
 
 			<!-- Impact Metrics -->
@@ -81,28 +119,28 @@
 					<div class="stat-icon icon-volume">📦</div>
 					<div class="stat-info">
 						<div class="stat-label">Volume Terdampak (Minggu Ini)</div>
-						<div class="stat-value">124 <span class="stat-unit">kg</span></div>
+						<div class="stat-value">{metrics.volumeTerdampak} <span class="stat-unit">kg</span></div>
 					</div>
 				</div>
 				<div class="stat-card glass-card danger">
 					<div class="stat-icon icon-quality">📉</div>
 					<div class="stat-info">
 						<div class="stat-label">Risiko Kualitas Buruk</div>
-						<div class="stat-value">15<span class="stat-unit">%</span></div>
+						<div class="stat-value">{metrics.risikoKualitas}<span class="stat-unit">%</span></div>
 					</div>
 				</div>
 				<div class="stat-card glass-card caution">
 					<div class="stat-icon icon-logistic">🚚</div>
 					<div class="stat-info">
 						<div class="stat-label">Keterlambatan Logistik</div>
-						<div class="stat-value">3 <span class="stat-unit">kasus</span></div>
+						<div class="stat-value">{metrics.keterlambatanLogistik} <span class="stat-unit">kasus</span></div>
 					</div>
 				</div>
 				<div class="stat-card glass-card info">
 					<div class="stat-icon icon-umkm">🏪</div>
 					<div class="stat-info">
 						<div class="stat-label">UMKM Terdampak</div>
-						<div class="stat-value">8 <span class="stat-unit">unit</span></div>
+						<div class="stat-value">{metrics.umkmTerdampak} <span class="stat-unit">unit</span></div>
 					</div>
 				</div>
 			</section>

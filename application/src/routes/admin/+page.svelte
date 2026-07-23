@@ -1,29 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 	import { userRole } from '$lib/stores/app.js';
-	import { activityLog, getActivitySummary } from '$lib/stores/activityLog.js';
 
 	let { data } = $props();
 
 	userRole.set('admin');
 
-	/** @type {{ totalUsers: number, todayActivities: number, roleDist: Record<string, number>, recentActivities: import('$lib/stores/activityLog.js').ActivityEntry[] }} */
-	let summary = $state({ totalUsers: 0, todayActivities: 0, roleDist: {}, recentActivities: [] });
-	/** @type {any[]} */
-	let registeredUsers = $state([]);
+	let summary = $derived(data.summary || { totalUsers: 0, todayActivities: 0, totalActivities: 0, roleDist: {}, recentActivities: [] });
+	let registeredUsers = $derived(data.registeredUsers || []);
 	let now = $state(new Date());
-
-	// Reactive: recalculate when activityLog changes
-	$effect(() => {
-		// Subscribe to changes
-		const _entries = $activityLog;
-		summary = getActivitySummary();
-
-		// Load registered users
-		try {
-			registeredUsers = JSON.parse(localStorage.getItem('taniva_users') || '[]');
-		} catch { registeredUsers = []; }
-	});
 
 	// Live clock
 	onMount(() => {
@@ -102,7 +87,7 @@
 					<div class="stat-icon icon-total">🔢</div>
 					<div class="stat-info">
 						<div class="stat-label">Total Log Aktivitas</div>
-						<div class="stat-value">{$activityLog.length}</div>
+						<div class="stat-value">{summary.totalActivities}</div>
 					</div>
 				</div>
 			</section>
