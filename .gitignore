@@ -1,6 +1,7 @@
 # OS
 .DS_Store
 Thumbs.db
+.vscode/
 
 # Context (private docs, not committed in some setups)
 /context/
