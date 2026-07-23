@@ -134,7 +134,6 @@
 </script>
 
 <div class="page-layout">
-	<div class="mesh-bg"></div>
 	
 	<div class="container animate-fade-in-up">
 		<a href="/petani" class="back-link">← Kembali ke Dashboard</a>
@@ -146,7 +145,7 @@
 		
 		<div class="content-area">
 			{#if currentStep === 'idle' || currentStep === 'validating' || currentStep === 'error'}
-				<div class="card glass-card form-container">
+				<div class="card form-container">
 					{#if currentStep === 'error'}
 						<ErrorBanner 
 							message={typeof globalError?.message === 'string' ? globalError.message : 'Terjadi kesalahan sistem'} 
@@ -198,7 +197,7 @@
 				</div>
 				
 			{:else if currentStep === 'uploading' || currentStep === 'analyzing'}
-				<div class="card glass-card">
+				<div class="card">
 					<LoadingSpinner label={currentStep === 'uploading' ? "Mengunggah data..." : "AI sedang menganalisis kualitas tomat..."} />
 				</div>
 				
@@ -285,24 +284,12 @@
 <style>
 	.page-layout {
 		min-height: 100dvh;
-		background: #faf9f5;
+		background: #f8fafc;
 		position: relative;
 		overflow: hidden;
 		padding: 2rem 1.5rem 6rem;
 		font-family: var(--font-sans, system-ui, sans-serif);
-	}
-
-	.mesh-bg {
-		position: absolute;
-		top: -50%;
-		left: -50%;
-		width: 200%;
-		height: 100vh;
-		background: 
-			radial-gradient(circle at 50% 0%, rgba(165, 214, 167, 0.15) 0%, transparent 50%),
-			radial-gradient(circle at 80% 20%, rgba(27, 94, 32, 0.05) 0%, transparent 50%);
-		z-index: 0;
-		pointer-events: none;
+		color: #0f172a;
 	}
 
 	.container {
@@ -317,13 +304,12 @@
 		margin-bottom: 1.5rem;
 		color: #1b5e20;
 		text-decoration: none;
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 0.875rem;
-		transition: transform 0.2s;
 	}
 	
 	.back-link:hover {
-		transform: translateX(-4px);
+		text-decoration: underline;
 	}
 
 	.page-header {
@@ -335,23 +321,21 @@
 		margin: 0 0 0.5rem;
 		font-size: 2rem;
 		font-weight: 800;
-		color: #111827;
+		color: #0f172a;
 		letter-spacing: -0.02em;
 	}
 
 	.page-subtitle {
 		margin: 0;
 		font-size: 1rem;
-		color: #6b7280;
+		color: #64748b;
 	}
 
-	.card.glass-card {
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(16px);
-		border: 1px solid rgba(255, 255, 255, 0.5);
-		border-radius: 20px;
+	.card {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
 		padding: 2rem;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
 	}
 
 	.form-container {
@@ -383,29 +367,31 @@
 	}
 
 	.form-label {
-		font-weight: 600;
-		font-size: 0.875rem;
+		font-weight: 700;
+		font-size: 0.8125rem;
 		margin-bottom: 0.5rem;
-		color: #374151;
+		color: #475569;
 	}
 
 	.form-input {
 		padding: 0.75rem 1rem;
-		border: 1px solid #d1d5db;
+		border: 1px solid #e2e8f0;
 		border-radius: 8px;
 		font-size: 1rem;
-		background: #fff;
-		transition: border-color 0.2s, box-shadow 0.2s;
+		background: #f8fafc;
+		color: #0f172a;
+		transition: border-color 0.2s;
 	}
 	
 	.form-input:focus {
 		outline: none;
 		border-color: #1b5e20;
-		box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
+		background: #ffffff;
 	}
 
 	.form-input:disabled {
-		background: #f3f4f6;
+		background: #f1f5f9;
+		color: #94a3b8;
 		cursor: not-allowed;
 	}
 
@@ -415,43 +401,36 @@
 		background: #1b5e20;
 		color: white;
 		border: none;
-		border-radius: 12px;
+		border-radius: 8px;
 		font-size: 1rem;
 		font-weight: 700;
 		cursor: pointer;
-		transition: all 0.2s;
-		box-shadow: 0 4px 6px rgba(27, 94, 32, 0.2);
+		transition: background 0.2s;
 	}
 
 	.btn-primary:hover:not(:disabled) {
 		background: #144d18;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 12px rgba(27, 94, 32, 0.3);
 	}
 
 	.btn-primary:disabled {
-		background: #9ca3af;
+		background: #94a3b8;
 		cursor: not-allowed;
-		transform: none;
-		box-shadow: none;
 	}
 
 	.btn-primary-outline {
 		width: 100%;
 		padding: 1rem;
 		background: transparent;
-		border: 2px solid #1b5e20;
+		border: 1px solid #1b5e20;
 		color: #1b5e20;
-		border-radius: 12px;
+		border-radius: 8px;
 		font-weight: 700;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: background 0.2s;
 	}
 	
 	.btn-primary-outline:hover {
-		background: #1b5e20;
-		color: white;
-		box-shadow: 0 4px 12px rgba(27, 94, 32, 0.15);
+		background: #f8fcf8;
 	}
 
 	.result-grid {
@@ -473,19 +452,19 @@
 	}
 
 	.stats-card {
-		background: white;
-		border-radius: 16px;
+		background: #ffffff;
+		border-radius: 12px;
 		padding: 1.5rem;
-		border: 1px solid #e5e7eb;
+		border: 1px solid #e2e8f0;
 		margin-top: 1rem;
 	}
 
 	.stats-card h4 {
 		margin: 0 0 1rem;
 		font-size: 1rem;
-		font-weight: 700;
-		color: #111827;
-		border-bottom: 1px solid #f3f4f6;
+		font-weight: 800;
+		color: #0f172a;
+		border-bottom: 1px solid #e2e8f0;
 		padding-bottom: 0.5rem;
 	}
 
@@ -495,34 +474,34 @@
 		align-items: center;
 		padding: 0.5rem 0;
 		font-size: 0.875rem;
-		border-bottom: 1px dashed #f3f4f6;
+		border-bottom: 1px solid #f1f5f9;
 	}
 
 	.stat-row:last-child {
 		border-bottom: none;
 	}
 
-	.text-success strong { color: #059669; }
-	.text-error strong { color: #dc2626; }
-	.text-muted strong { color: #6b7280; }
-	.text-mono { font-family: monospace; background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 4px; }
+	.text-success strong { color: #166534; }
+	.text-error strong { color: #b91c1c; }
+	.text-muted strong { color: #64748b; }
+	.text-mono { font-family: monospace; background: #f8fafc; padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid #e2e8f0; }
 
 	.badge-status {
 		background: #dcfce7;
 		color: #166534;
 		padding: 0.25rem 0.75rem;
-		border-radius: 9999px;
+		border-radius: 4px;
 		font-size: 0.75rem;
 		text-transform: uppercase;
+		font-weight: 700;
 	}
 
 	.annotated-image-wrapper {
 		position: relative;
-		border-radius: 16px;
+		border-radius: 12px;
 		overflow: hidden;
-		border: 1px solid #e5e7eb;
-		background: #f9fafb;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		border: 1px solid #e2e8f0;
+		background: #ffffff;
 	}
 
 	.annotated-img {
@@ -535,20 +514,20 @@
 		position: absolute;
 		top: 1rem;
 		left: 1rem;
-		background: rgba(0, 0, 0, 0.7);
-		color: white;
+		background: #ffffff;
+		color: #0f172a;
 		padding: 0.25rem 0.75rem;
-		border-radius: 9999px;
+		border-radius: 4px;
 		font-size: 0.75rem;
-		font-weight: 600;
-		backdrop-filter: blur(4px);
+		font-weight: 700;
+		border: 1px solid #e2e8f0;
 	}
 
 	.mt-4 { margin-top: 1rem; }
 	.mt-6 { margin-top: 1.5rem; }
 
 	.animate-fade-in-up {
-		animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: fadeInUp 0.4s ease-out forwards;
 	}
 
 	.animate-fade-in {
@@ -556,7 +535,7 @@
 	}
 
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(20px); }
+		from { opacity: 0; transform: translateY(10px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 
