@@ -30,8 +30,15 @@ beforeEach(async () => {
 
 describe('extractIntent', () => {
 	it('returns structured result on success', async () => {
+		const apiResponse = {
+			status: 'complete',
+			intent: validIntent,
+			missingFields: [],
+			clarificationQuestion: null
+		};
+
 		vi.doMock('./openrouter.service.js', () => ({
-			fetchIntentFromOpenRouter: vi.fn().mockResolvedValue(JSON.stringify(validIntent)),
+			fetchIntentFromOpenRouter: vi.fn().mockResolvedValue(JSON.stringify(apiResponse)),
 			OpenRouterError
 		}));
 
@@ -41,8 +48,9 @@ describe('extractIntent', () => {
 		const result = await extractIntent('Saya butuh 20 kg tomat kualitas bagus untuk besok');
 
 		expect(result.rawText).toBe('Saya butuh 20 kg tomat kualitas bagus untuk besok');
+		expect(result.status).toBe('complete');
 		expect(result.intent).toEqual(validIntent);
-		expect(result.requiresConfirmation).toBe(true);
+		expect(result.missingFields).toEqual([]);
 		expect(result.meta.source).toBe('openrouter-gemma-4');
 		expect(result.meta.model).toBe('google/gemma-4-31b-it');
 		expect(result.meta.fallbackUsed).toBe(false);
@@ -50,7 +58,13 @@ describe('extractIntent', () => {
 	});
 
 	it('cleans code fence from response', async () => {
-		const fencedContent = '```json\n' + JSON.stringify(validIntent) + '\n```';
+		const apiResponse = {
+			status: 'complete',
+			intent: validIntent,
+			missingFields: [],
+			clarificationQuestion: null
+		};
+		const fencedContent = '```json\n' + JSON.stringify(apiResponse) + '\n```';
 
 		vi.doMock('./openrouter.service.js', () => ({
 			fetchIntentFromOpenRouter: vi.fn().mockResolvedValue(fencedContent),

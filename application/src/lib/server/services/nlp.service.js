@@ -50,8 +50,11 @@ export async function extractIntent(text) {
 
 		return {
 			rawText: text,
-			intent: validationResult.data,
-			requiresConfirmation: true,
+			status: validationResult.data.status,
+			intent: validationResult.data.intent || null,
+			partialIntent: validationResult.data.partialIntent || null,
+			missingFields: validationResult.data.missingFields,
+			clarificationQuestion: validationResult.data.clarificationQuestion,
 			meta: {
 				source: 'openrouter-gemma-4',
 				model: config.OPENROUTER_MODEL,

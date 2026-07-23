@@ -1,8 +1,10 @@
 import { json } from '@sveltejs/kit';
+import crypto from 'crypto';
 import { extractIntentRequestSchema } from '$lib/schemas/nlp.js';
 import { extractIntent } from '$lib/server/services/nlp.service.js';
 import { OpenRouterError } from '$lib/server/services/openrouter.service.js';
 
+/** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
 	try {
 		const body = await request.json();
@@ -24,15 +26,26 @@ export async function POST({ request }) {
 
 		const result = await extractIntent(validationResult.data.text);
 
-		return json({
-			success: true,
-			data: {
-				rawText: result.rawText,
+		if (result.status === 'complete') {
+			return json({
+				status: 'complete',
 				intent: result.intent,
-				requiresConfirmation: result.requiresConfirmation
-			},
-			meta: result.meta
-		});
+				missingFields: [],
+				clarificationQuestion: null
+			});
+		} else {
+			return json({
+				status: 'needs_clarification',
+				partialIntent: result.partialIntent || {
+					commodity: 'tomato',
+					quantityKg: null,
+					minimumQuality: null,
+					neededDate: null
+				},
+				missingFields: result.missingFields || [],
+				clarificationQuestion: result.clarificationQuestion || 'Mohon lengkapi pesanan Anda.'
+			});
+		}
 	} catch (error) {
 		if (error instanceof OpenRouterError) {
 			return json(
