@@ -21,6 +21,7 @@ Thumbs.db
 # agents
 DESIGN.md
 TANIVA.md
+CONSTRAINT.md
 .agents/**/*
 # Prisma
 /src/generated/
