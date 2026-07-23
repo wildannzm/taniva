@@ -1,15 +1,13 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { onMount } from 'svelte';
 	
 	let { form } = $props();
 
 	let authMode = $state('login'); // 'login' | 'register'
-	let name = $state(form?.name || '');
-	let email = $state(form?.email || '');
+	let name = $state(String(form?.name || ''));
+	let email = $state(String(form?.email || ''));
 	let password = $state('');
-	
-	/** @type {'petani'|'umkm'} */
-	let selectedRole = $state(form?.role || 'petani'); 
 	let isAuthenticating = $state(false);
 
 	onMount(() => {

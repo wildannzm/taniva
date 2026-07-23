@@ -3,6 +3,7 @@ import { prisma } from '$lib/server/db/prisma.js';
 import bcrypt from 'bcryptjs';
 import { signToken } from '$lib/server/jwt.js';
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	login: async ({ request, cookies }) => {
 		const data = await request.formData();
@@ -44,7 +45,6 @@ export const actions = {
 		});
 
 		// Redirect based on role
-		const route = user.role.toLowerCase();
 		const redirectUrl = user.role === 'FARMER' ? '/petani' : (user.role === 'UMKM' ? '/umkm' : '/');
 		throw redirect(303, redirectUrl);
 	},
