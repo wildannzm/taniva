@@ -52,7 +52,7 @@ enum QualityLabel {
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id           String        @id @default(uuid()) @db.Char(36)
+  id           String        @id @default(uuid())
   name         String        @db.VarChar(120)
   email        String?       @unique @db.VarChar(255)
   passwordHash String?       @map("password_hash")
@@ -127,7 +127,7 @@ model HarvestBatch {
   updatedAt           DateTime                @updatedAt @map("updated_at")
 
   @@index([farmerId])
-  @@index([status, commodity, qualityScore, availableDate])
+  @@index([status, commodity, qualityScore, availableDate], map: "idx_harvest_batches_search")
   @@index([availableDate])
   @@map("harvest_batches")
 }
@@ -220,8 +220,8 @@ model Rating {
 }
 
 model ActivityLog {
-  id        String   @id @default(uuid()) @db.Char(36)
-  userId    String   @map("user_id") @db.Char(36)
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   action    String
   details   Json?
   createdAt DateTime @default(now()) @map("created_at")
@@ -230,6 +230,8 @@ model ActivityLog {
 
   @@index([userId])
   @@map("activity_logs")
+}
+
 enum FulfillmentType {
   SINGLE @map("single")
   SPLIT  @map("split")

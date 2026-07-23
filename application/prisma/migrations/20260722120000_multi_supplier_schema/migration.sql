@@ -71,7 +71,7 @@ CREATE UNIQUE INDEX `ratings_allocation_id_key` ON `ratings`(`allocation_id`);
 
 -- CreateIndex
 DROP INDEX `harvest_batches_status_commodity_quality_score_idx` ON `harvest_batches`;
-CREATE INDEX `harvest_batches_status_commodity_quality_score_available_date_idx` ON `harvest_batches`(`status`, `commodity`, `quality_score`, `available_date`);
+CREATE INDEX `idx_harvest_batches_search` ON `harvest_batches`(`status`, `commodity`, `quality_score`, `available_date`);
 
 -- AddForeignKey
 ALTER TABLE `fulfillment_options` ADD CONSTRAINT `fulfillment_options_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
