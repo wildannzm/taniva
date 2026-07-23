@@ -12,6 +12,10 @@
 	let selectedRole = $state(form?.role || 'petani'); 
 	let isAuthenticating = $state(false);
 
+	onMount(() => {
+		// Seeding is now handled by Prisma (prisma/seed.js)
+	});
+
 	/** @param {'login' | 'register'} mode */
 	function toggleMode(mode) {
 		authMode = mode;
@@ -83,32 +87,8 @@
 					<div class="input-line"></div>
 				</div>
 
-				{#if authMode === 'register'}
-					<div class="role-selector animate-expand">
-						<p class="role-label">Pilih Peran Anda</p>
-						<div class="role-grid">
-							<label class="role-card {selectedRole === 'petani' ? 'selected' : ''}">
-								<input type="radio" name="role" value="petani" bind:group={selectedRole} />
-								<div class="role-icon">🧑‍🌾</div>
-								<div class="role-text">
-									<span class="role-title">Petani</span>
-									<span class="role-desc">Penyedia Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-							
-							<label class="role-card {selectedRole === 'umkm' ? 'selected' : ''}">
-								<input type="radio" name="role" value="umkm" bind:group={selectedRole} />
-								<div class="role-icon">🏪</div>
-								<div class="role-text">
-									<span class="role-title">UMKM</span>
-									<span class="role-desc">Pembeli Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-						</div>
-					</div>
-				{/if}
+
+
 
 				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || email.trim().length < 5 || password.length < 3}>
 					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
@@ -375,8 +355,15 @@
 
 	.role-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	@media (min-width: 480px) {
+		.role-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+		}
 	}
 
 	.role-card {

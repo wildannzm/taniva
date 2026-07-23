@@ -32,7 +32,7 @@
 				<div class="topbar-actions">
 					{#if $userRole}
 						<span class="role-badge">
-							{$userRole === 'petani' ? '🧑‍🌾 Petani' : '🍽️ UMKM'}
+							{$userRole === 'petani' ? '🧑‍🌾 Petani' : $userRole === 'umkm' ? '🍽️ UMKM' : '🛡️ Admin'}
 						</span>
 						<button class="btn-logout" onclick={handleLogout} aria-label="Logout">
 							Logout
