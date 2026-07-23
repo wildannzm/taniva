@@ -9,6 +9,7 @@
 
 	onMount(async () => {
 		// Import leaflet dynamically to avoid SSR issues
+		// @ts-ignore
 		const L = (await import('leaflet')).default;
 		
 		// Initialize map

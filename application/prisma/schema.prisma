@@ -1,5 +1,5 @@
 generator client {
-  provider     = "prisma-client"
+  provider     = "prisma-client-js"
   output       = "../src/generated/prisma"
   moduleFormat = "esm"
 }
@@ -263,6 +263,7 @@ model FulfillmentAllocation {
   routeGeometry       Json?             @map("route_geometry") @db.Json
   qualityScore        Decimal           @map("quality_score") @db.Decimal(5, 2)
   reputationScore     Decimal           @map("reputation_score") @db.Decimal(5, 2)
+  status              String            @default("PENDING") @db.VarChar(40)
   sequence            Int               @default(1)
   option              FulfillmentOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
   batch               HarvestBatch      @relation(fields: [batchId], references: [id], onDelete: Restrict)

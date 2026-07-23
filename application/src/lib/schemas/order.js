@@ -23,6 +23,12 @@ export const createOrderSchema = z
 		confirmed: z.literal(true, {
 			message: 'Order must be confirmed by UMKM before saving.'
 		}),
-		idempotencyKey: z.string().max(128).optional()
+		idempotencyKey: z.string().max(255).optional()
+	})
+	.strict();
+
+export const selectFulfillmentSchema = z
+	.object({
+		fulfillmentOptionId: z.string().uuid()
 	})
 	.strict();

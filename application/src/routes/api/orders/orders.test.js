@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('$lib/server/db/prisma', () => {
 	return {
-		default: {
+		prisma: {
 			order: {
 				findUnique: vi.fn(),
 				create: vi.fn()
@@ -15,7 +15,7 @@ vi.mock('$lib/server/db/prisma', () => {
 	};
 });
 
-import prisma from '$lib/server/db/prisma';
+import { prisma } from '$lib/server/db/prisma';
 import { POST } from './+server.js';
 import { GET } from './[orderId]/+server.js';
 
