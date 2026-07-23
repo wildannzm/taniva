@@ -27,7 +27,6 @@
 </script>
 
 <div class="page-layout">
-	<div class="mesh-bg"></div>
 	
 	<div class="container animate-fade-in-up">
 		<a href="/petani" class="back-link">← Kembali ke Dashboard</a>
@@ -43,11 +42,11 @@
 		
 		<div class="content-area">
 			{#if currentStep === 'loading'}
-				<div class="card glass-card">
+				<div class="card">
 					<LoadingSpinner label="Mengambil data reputasi..." />
 				</div>
 			{:else if currentStep === 'done'}
-				<div class="card glass-card text-center animate-scale-in">
+				<div class="card text-center animate-scale-in">
 					<div class="score-circle">
 						<span class="score-val">{score.toFixed(1)}</span>
 						<span class="score-max">/100</span>
@@ -72,24 +71,11 @@
 <style>
 	.page-layout {
 		min-height: 100dvh;
-		background: #faf9f5;
+		background: #f8fafc;
 		position: relative;
 		overflow: hidden;
 		padding: 2rem 1.5rem 6rem;
 		font-family: var(--font-sans, system-ui, sans-serif);
-	}
-
-	.mesh-bg {
-		position: absolute;
-		top: -50%;
-		left: -50%;
-		width: 200%;
-		height: 100vh;
-		background: 
-			radial-gradient(circle at 50% 0%, rgba(165, 214, 167, 0.15) 0%, transparent 50%),
-			radial-gradient(circle at 80% 20%, rgba(27, 94, 32, 0.05) 0%, transparent 50%);
-		z-index: 0;
-		pointer-events: none;
 	}
 
 	.container {
@@ -104,13 +90,12 @@
 		margin-bottom: 1.5rem;
 		color: #1b5e20;
 		text-decoration: none;
-		font-weight: 600;
+		font-weight: 700;
 		font-size: 0.875rem;
-		transition: transform 0.2s;
 	}
 	
 	.back-link:hover {
-		transform: translateX(-4px);
+		text-decoration: underline;
 	}
 
 	.page-header {
@@ -122,23 +107,21 @@
 		margin: 0 0 0.5rem;
 		font-size: 2rem;
 		font-weight: 800;
-		color: #111827;
+		color: #0f172a;
 		letter-spacing: -0.02em;
 	}
 	
 	.page-subtitle {
 		margin: 0;
 		font-size: 1rem;
-		color: #6b7280;
+		color: #64748b;
 	}
 
-	.card.glass-card {
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(16px);
-		border: 1px solid rgba(255, 255, 255, 0.5);
-		border-radius: 20px;
+	.card {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
 		padding: 3rem 2rem;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
 	}
 	
 	.text-center { text-align: center; }
@@ -147,14 +130,13 @@
 		width: 12rem;
 		height: 12rem;
 		border-radius: 50%;
-		background: #e8f5e9;
+		background: #f8fcf8;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		margin: 0 auto 2rem;
-		border: 6px solid #1b5e20;
-		box-shadow: 0 12px 32px rgba(27, 94, 32, 0.15);
+		border: 4px solid #1b5e20;
 	}
 
 	.score-val {
@@ -167,7 +149,7 @@
 
 	.score-max {
 		font-size: 1.25rem;
-		font-weight: 600;
+		font-weight: 700;
 		color: rgba(27, 94, 32, 0.7);
 		margin-top: 0.25rem;
 	}
@@ -175,27 +157,27 @@
 	.status-title {
 		margin: 0 0 1rem;
 		font-size: 1.5rem;
-		font-weight: 700;
-		color: #111827;
+		font-weight: 800;
+		color: #0f172a;
 	}
 
 	.status-desc {
 		margin: 0;
 		font-size: 0.9375rem;
-		color: #6b7280;
+		color: #64748b;
 		line-height: 1.6;
 	}
 
 	.animate-fade-in-up {
-		animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: fadeInUp 0.4s ease-out forwards;
 	}
 	
 	.animate-scale-in {
-		animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: scaleIn 0.4s ease-out forwards;
 	}
 
 	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(20px); }
+		from { opacity: 0; transform: translateY(10px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
 	
