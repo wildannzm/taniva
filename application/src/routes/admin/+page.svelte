@@ -66,6 +66,7 @@
 			<div class="hero-text animate-slide-up">
 				<h1 class="page-title">Dashboard Monitoring</h1>
 				<p class="page-subtitle">Pantau seluruh aktivitas ekosistem Taniva secara real-time.</p>
+				<a href="/admin/impact" class="impact-link-btn">Lihat Smart Impact Dashboard →</a>
 			</div>
 			<div class="clock-badge animate-slide-up" style="animation-delay: 100ms;">
 				<div class="clock-icon">🕐</div>
@@ -248,8 +249,28 @@
 	.page-subtitle {
 		font-size: 0.9375rem;
 		color: rgba(255, 255, 255, 0.8);
-		margin: 0;
+		margin: 0 0 1.5rem;
 		line-height: 1.5;
+	}
+
+	.impact-link-btn {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		background: rgba(255, 255, 255, 0.15);
+		color: #ffffff;
+		text-decoration: none;
+		border-radius: 100px;
+		font-weight: 600;
+		font-size: 0.875rem;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		backdrop-filter: blur(10px);
+		transition: all 0.2s;
+	}
+
+	.impact-link-btn:hover {
+		background: rgba(255, 255, 255, 0.25);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 	}
 
 	.clock-badge {
