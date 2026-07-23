@@ -1,9 +1,9 @@
 // src/lib/stores/app.js
 import { writable } from 'svelte/store';
 
-// Global state for current user role ('petani' | 'umkm' | null)
+// Global state for current user role ('petani' | 'umkm' | 'admin' | null)
 // In a real app this would be populated from auth/session
-/** @type {import('svelte/store').Writable<'petani' | 'umkm' | null>} */
+/** @type {import('svelte/store').Writable<'petani' | 'umkm' | 'admin' | null>} */
 export const userRole = writable(null);
 
 /**

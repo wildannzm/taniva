@@ -1,58 +1,27 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { userRole } from '$lib/stores/app.js';
+	import { enhance } from '$app/forms';
 	
+	let { form } = $props();
+
 	let authMode = $state('login'); // 'login' | 'register'
-	let username = $state('');
+	let name = $state(form?.name || '');
+	let email = $state(form?.email || '');
 	let password = $state('');
 	
 	/** @type {'petani'|'umkm'} */
-	let selectedRole = $state('petani'); 
+	let selectedRole = $state(form?.role || 'petani'); 
 	let isAuthenticating = $state(false);
-	let errorMsg = $state('');
+
+	onMount(() => {
+		// Seeding is now handled by Prisma (prisma/seed.js)
+	});
 
 	/** @param {'login' | 'register'} mode */
 	function toggleMode(mode) {
 		authMode = mode;
-		errorMsg = '';
-		username = '';
+		name = '';
+		email = '';
 		password = '';
-	}
-
-	function handleAuth() {
-		errorMsg = '';
-		if (username.trim().length < 3 || password.length < 3) {
-			errorMsg = 'Username dan password minimal 3 karakter.';
-			return;
-		}
-
-		isAuthenticating = true;
-		
-		setTimeout(() => {
-			isAuthenticating = false;
-			
-			/** @type {any[]} */
-			const users = JSON.parse(localStorage.getItem('taniva_users') || '[]');
-
-			if (authMode === 'register') {
-				if (users.find(u => u.username === username)) {
-					errorMsg = 'Username sudah terdaftar.';
-					return;
-				}
-				users.push({ username, password, role: selectedRole });
-				localStorage.setItem('taniva_users', JSON.stringify(users));
-				userRole.set(selectedRole);
-				goto(`/${selectedRole}`);
-			} else {
-				const user = users.find(u => u.username === username && u.password === password);
-				if (user) {
-					userRole.set(user.role);
-					goto(`/${user.role}`);
-				} else {
-					errorMsg = 'Username atau kata sandi salah.';
-				}
-			}
-		}, 1200);
 	}
 </script>
 
@@ -84,54 +53,44 @@
 				<p>{authMode === 'login' ? 'Masuk ke ekosistem Taniva.' : 'Buat akun Taniva dalam hitungan detik.'}</p>
 			</div>
 
-			<form class="auth-form" onsubmit={(e) => { e.preventDefault(); handleAuth(); }}>
-				{#if errorMsg}
+			<form class="auth-form" method="POST" action="?/{authMode}" use:enhance={() => {
+				isAuthenticating = true;
+				return async ({ update }) => {
+					await update();
+					isAuthenticating = false;
+				};
+			}}>
+				{#if form?.error}
 					<div class="error-toast animate-shake">
 						<span class="error-icon">⚠</span>
-						<span>{errorMsg}</span>
+						<span>{form.error}</span>
+					</div>
+				{/if}
+
+				{#if authMode === 'register'}
+					<div class="input-container animate-expand">
+						<input type="text" id="name" name="name" bind:value={name} required={authMode === 'register'} placeholder=" " />
+						<label for="name">Nama Lengkap</label>
+						<div class="input-line"></div>
 					</div>
 				{/if}
 
 				<div class="input-container">
-					<input type="text" id="username" bind:value={username} required placeholder=" " />
-					<label for="username">Username / No. HP</label>
+					<input type="email" id="email" name="email" bind:value={email} required placeholder=" " />
+					<label for="email">Email</label>
 					<div class="input-line"></div>
 				</div>
 
 				<div class="input-container">
-					<input type="password" id="password" bind:value={password} required placeholder=" " />
+					<input type="password" id="password" name="password" bind:value={password} required placeholder=" " />
 					<label for="password">Kata Sandi</label>
 					<div class="input-line"></div>
 				</div>
 
-				{#if authMode === 'register'}
-					<div class="role-selector animate-expand">
-						<p class="role-label">Pilih Peran Anda</p>
-						<div class="role-grid">
-							<label class="role-card {selectedRole === 'petani' ? 'selected' : ''}">
-								<input type="radio" name="role" value="petani" bind:group={selectedRole} />
-								<div class="role-icon">🧑‍🌾</div>
-								<div class="role-text">
-									<span class="role-title">Petani</span>
-									<span class="role-desc">Penyedia Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-							
-							<label class="role-card {selectedRole === 'umkm' ? 'selected' : ''}">
-								<input type="radio" name="role" value="umkm" bind:group={selectedRole} />
-								<div class="role-icon">🏪</div>
-								<div class="role-text">
-									<span class="role-title">UMKM</span>
-									<span class="role-desc">Pembeli Panen</span>
-								</div>
-								<div class="check-circle"></div>
-							</label>
-						</div>
-					</div>
-				{/if}
 
-				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || username.trim().length < 3 || password.length < 3}>
+
+
+				<button type="submit" class="submit-btn {isAuthenticating ? 'loading' : ''}" disabled={isAuthenticating || email.trim().length < 5 || password.length < 3}>
 					<span class="btn-text">{authMode === 'login' ? 'Masuk Sekarang' : 'Buat Akun'}</span>
 					{#if isAuthenticating}
 						<div class="spinner"></div>
@@ -396,8 +355,15 @@
 
 	.role-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	@media (min-width: 480px) {
+		.role-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+		}
 	}
 
 	.role-card {

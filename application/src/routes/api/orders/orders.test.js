@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('$lib/server/db/prisma', () => {
 	return {
-		prisma: {
+		default: {
 			order: {
 				findUnique: vi.fn(),
 				create: vi.fn()
