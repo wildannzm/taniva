@@ -1,18 +1,12 @@
 <script>
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import { userRole } from '$lib/stores/app.js';
 	import { page } from '$app/stores';
 	
-	let { children } = $props();
+	let { children, data } = $props();
 	
 	// Show nav only if not on the root landing page
 	let showNav = $derived($page.url.pathname !== '/');
-	
-	function handleLogout() {
-		userRole.set(null);
-		window.location.href = '/';
-	}
 </script>
 
 <svelte:head>
@@ -24,19 +18,19 @@
 	{#if showNav}
 		<header class="app-topbar">
 			<div class="topbar-container">
-				<a href={$userRole ? `/${$userRole}` : '/'} class="brand">
+				<a href={data.user ? `/${data.user.role === 'ADMIN' ? 'admin' : data.user.role === 'UMKM' ? 'umkm' : 'petani'}` : '/'} class="brand">
 					<span class="brand-logo">🌿</span>
 					<span class="brand-text">Taniva</span>
 				</a>
 				
 				<div class="topbar-actions">
-					{#if $userRole}
+					{#if data.user}
 						<span class="role-badge">
-							{$userRole === 'petani' ? '🧑‍🌾 Petani' : $userRole === 'umkm' ? '🍽️ UMKM' : '🛡️ Admin'}
+							{data.user.role === 'FARMER' ? '🧑‍🌾 Petani' : data.user.role === 'UMKM' ? '🍽️ UMKM' : '🛡️ Admin'}
 						</span>
-						<button class="btn-logout" onclick={handleLogout} aria-label="Logout">
+						<a href="/logout" data-sveltekit-reload class="btn-logout" aria-label="Logout">
 							Logout
-						</button>
+						</a>
 					{/if}
 				</div>
 			</div>

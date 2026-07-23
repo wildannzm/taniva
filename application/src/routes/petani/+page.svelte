@@ -3,6 +3,8 @@
 	import { userRole } from '$lib/stores/app.js';
 	import QualityScoreCard from '$lib/components/QualityScoreCard.svelte';
 	
+	let { data } = $props();
+	
 	let recentHarvests = $state([
 		{ id: 'BATCH-001', date: 'Hari ini, 08:30', quality: 92, weight: '50 kg', status: 'verified' },
 		{ id: 'BATCH-002', date: 'Kemarin, 14:15', quality: 85, weight: '120 kg', status: 'verified' },
@@ -20,7 +22,7 @@
 		<div class="mesh-bg"></div>
 		<div class="hero-content">
 			<div class="hero-text animate-slide-up">
-				<h1 class="page-title">Selamat datang, Petani!</h1>
+				<h1 class="page-title">Selamat datang, {data.user?.name}!</h1>
 				<p class="page-subtitle">Kelola panen dan pantau kualitas tomat Anda hari ini.</p>
 			</div>
 			<div class="reputation-badge animate-slide-up" style="animation-delay: 100ms;">
