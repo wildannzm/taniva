@@ -300,7 +300,7 @@ export async function POST({ request, url }) {
 				success: false,
 				error: {
 					code: 'INTERNAL_ERROR',
-					message: 'Error internal yang tidak diekspos',
+					message: 'Error internal: ' + (err.message || 'tidak diketahui'),
 					details: []
 				},
 				requestId: crypto.randomUUID()
