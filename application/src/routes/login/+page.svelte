@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { userRole } from '$lib/stores/app.js';
-	import { seedDatabase } from '$lib/stores/seeder.js';
 	import { logActivity } from '$lib/stores/activityLog.js';
 	
 	let authMode = $state('login'); // 'login' | 'register'
@@ -15,7 +14,7 @@
 	let errorMsg = $state('');
 
 	onMount(() => {
-		seedDatabase();
+		// Seeding is now handled by Prisma (prisma/seed.js)
 	});
 
 	/** @param {'login' | 'register'} mode */

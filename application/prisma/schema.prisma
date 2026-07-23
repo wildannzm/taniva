@@ -52,15 +52,16 @@ enum QualityLabel {
 // ─── Models ──────────────────────────────────────────────
 
 model User {
-  id           String   @id @default(uuid())
-  name         String   @db.VarChar(120)
-  email        String?  @unique @db.VarChar(255)
-  passwordHash String?  @map("password_hash")
+  id           String        @id @default(uuid()) @db.Char(36)
+  name         String        @db.VarChar(120)
+  email        String?       @unique @db.VarChar(255)
+  passwordHash String?       @map("password_hash")
   role         UserRole
   farmer       Farmer?
   umkm         Umkm?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  activityLogs ActivityLog[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -218,6 +219,17 @@ model Rating {
   @@map("ratings")
 }
 
+model ActivityLog {
+  id        String   @id @default(uuid()) @db.Char(36)
+  userId    String   @map("user_id") @db.Char(36)
+  action    String
+  details   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("activity_logs")
 enum FulfillmentType {
   SINGLE @map("single")
   SPLIT  @map("split")
