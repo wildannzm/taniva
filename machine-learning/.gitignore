@@ -26,9 +26,6 @@ env/
 Thumbs.db
 
 # Model weights (large files)
-models/*.pt
-models/*.onnx
-!models/.gitkeep
 
 # Results (generated at runtime)
 results/*
@@ -36,3 +33,6 @@ results/*
 
 # Jupyter
 .ipynb_checkpoints/
+
+dataset-raw/
+dataset/
