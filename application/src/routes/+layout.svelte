@@ -103,27 +103,43 @@
 	}
 
 	.role-badge {
-		font-size: 0.75rem;
+		font-size: 0.65rem;
 		font-weight: 600;
 		background: var(--color-surface-container-high);
-		padding: 0.25rem 0.625rem;
+		padding: 0.25rem 0.5rem;
 		border-radius: var(--radius-full);
 		color: var(--color-on-surface);
 		display: flex;
 		align-items: center;
 		gap: 0.25rem;
+		white-space: nowrap;
+	}
+
+	@media (min-width: 480px) {
+		.role-badge {
+			font-size: 0.75rem;
+			padding: 0.25rem 0.625rem;
+		}
 	}
 
 	.btn-logout {
 		background: #fee2e2;
 		border: 1px solid #fca5a5;
 		border-radius: 100px;
-		font-size: 0.8125rem;
+		font-size: 0.7rem;
 		font-weight: 700;
 		color: #dc2626;
 		cursor: pointer;
-		padding: 0.4rem 1rem;
+		padding: 0.3rem 0.75rem;
 		transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+		white-space: nowrap;
+	}
+
+	@media (min-width: 480px) {
+		.btn-logout {
+			font-size: 0.8125rem;
+			padding: 0.4rem 1rem;
+		}
 	}
 
 	.btn-logout:hover {
